@@ -467,3 +467,10 @@ body.gated .toast { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 .notify { display: flex; flex-direction: column; gap: 12px; }
 .notify h2 .ic { color: var(--yellow); }
 .ing-q { max-width: 58%; } .ing-n { overflow-wrap: anywhere; }
+
+.notify-demo, .notify-cta { display: flex; gap: 12px; align-items: center; }
+.notify-demo { background: var(--bg-3); }
+.nd-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--yellow-soft); color: var(--yellow); display: grid; place-items: center; flex: none; }
+.notify-cta { border-color: rgba(255, 200, 61, .3); }
+.nc-txt { flex: 1; min-width: 0; }
+.btn.small.primary { background: var(--yellow); color: var(--yellow-ink); }

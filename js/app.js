@@ -370,9 +370,16 @@
       if (!N.S.pantry.some(function (i) { return i.foodId === id && i.always; }))
         N.put('pantry', { id: N.uid(), foodId: id, name: N.FOOD[id].name, always: true, grams: 0, addedAt: Date.now(), source: 'base', cat: N.FOOD[id].cat });
     });
-    N.gate = null; N.tab = 'spesa'; N.render();
-    N.toast('Tutto pronto: inizia dalla lista della spesa');
+    if (N.push.status() === 'push' || N.push.status() === 'local') return A['ob-done']();
+    N.gate = 'obNotify'; N.render();
   };
+  A['ob-notify'] = function () {
+    N.push.enable().then(function (st) {
+      A['ob-done']();
+      N.toast(st === 'push' || st === 'local' ? 'Notifiche attive. Inizia dalla lista della spesa' : 'Puoi attivarle quando vuoi dal Profilo');
+    });
+  };
+  A['ob-done'] = function () { N.gate = null; N.tab = 'spesa'; N.render(); N.toast('Tutto pronto: inizia dalla lista della spesa'); };
   A['auth-mode'] = function (el) { N.authMode = el.dataset.m; N.render(); };
   A['goal-change'] = function (el) {
     var d = el.closest('form').querySelector('details.custom'); if (d && el.value === 'personalizzato') d.open = true;
@@ -471,7 +478,9 @@
       if (!N.me()) { N.gate = 'welcome'; return N.render(); }
     }
     N.render();
-    setTimeout(function () { try { N.push.checkLocal(); } catch (e) { } }, 1500);
+    setTimeout(function () {
+      Promise.resolve(N.push.autoEnable()).catch(function () { }).then(function () { try { N.push.checkLocal(); } catch (e) { } });
+    }, 1500);
   };
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible' && !N.gate && N.me()) { N.softRender(); try { N.push.checkLocal(); } catch (e) { } }

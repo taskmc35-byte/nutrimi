@@ -114,7 +114,24 @@
       if (!('Notification' in window) || !('serviceWorker' in navigator)) return 'unsupported';
       if (Notification.permission === 'denied') return 'denied';
       var p = pref();
-      return Notification.permission === 'granted' && p ? p : 'off';
+      return Notification.permission === 'granted' && p && p !== 'disabled' ? p : 'off';
+    },
+    /* "off" scelto dalla persona (non riattivare da soli) o mai chiesto */
+    disabledByUser: function () { return pref() === 'disabled'; },
+    /* attivazione automatica: se il permesso c'è già, iscrive il telefono senza chiedere nulla */
+    autoEnable: async function () {
+      if (window.NUTRIMI_PREVIEW || !('Notification' in window) || Notification.permission !== 'granted' || pref() === 'disabled') return;
+      if (pref() === 'push') return N.push.refresh();
+      if (pref() !== 'push' && N.cloud.active) return N.push.enable();
+      if (!pref()) setPref('local');
+    },
+    /* ripete l'iscrizione sul server (es. dopo un nuovo accesso) */
+    refresh: async function () {
+      try {
+        if (!N.cloud.active || !('PushManager' in window)) return;
+        var reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+        if (sub) await N.cloud.savePush(sub.toJSON()); else await N.push.enable();
+      } catch (e) { console.error(e); }
     },
     enable: async function () {
       var perm = await Notification.requestPermission();
@@ -135,7 +152,7 @@
         var reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
         if (sub) { if (N.cloud.active) await N.cloud.removePush(sub.endpoint); await sub.unsubscribe(); }
       } catch (e) { }
-      setPref(null);
+      setPref('disabled');
     },
     test: function () {
       var soon = N.soonItems();

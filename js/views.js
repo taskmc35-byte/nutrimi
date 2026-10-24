@@ -110,6 +110,8 @@
       bar('Proteine', eaten.p, t.p, 'p') + bar('Carboidrati', eaten.c, t.c, 'c') + bar('Grassi', eaten.f, t.f, 'f') +
       '<p class="today-note">' + goalLabel(me.goal) + ' · ' + (left > 0 ? 'ti restano <b>' + N.f0(left) + ' kcal</b>' : 'obiettivo calorico raggiunto') + '</p></div></section>';
 
+    var pst = N.push.status();
+    if (pst === 'off' && !N.push.disabledByUser()) h += '<div class="card notify-cta"><span class="nd-ic">' + N.IC.bell + '</span><div class="nc-txt"><b>Attiva gli avvisi di scadenza</b><p class="muted small">Ti avvisiamo alle 9:00, 3 giorni prima.</p></div><button class="btn small primary" data-a="push-on">Attiva</button></div>';
     var soon = N.soonItems(), expired = N.expiredItems();
     if (soon.length) {
       h += '<section class="card usesoon"><div class="sec-head"><h2>' + N.IC.bell + 'Da consumare presto</h2></div><ul class="plain">' + soon.slice(0, 5).map(function (i) {
@@ -402,15 +404,28 @@
       '<form class="card" id="hhform-join" novalidate><h2>Hai un codice?</h2><label class="field"><span>Codice casa</span><input id="hh-code" autocapitalize="characters" placeholder="es. 7F3K9Q"></label><p class="form-err" id="hh-err" hidden></p><button class="btn ghost block" type="submit">Entra nella casa</button></form></div>';
   };
   N.views.obProfile = function () {
-    return '<div class="gate-wrap"><p class="eyebrow">Passo 1 di 2</p><h1>Il tuo profilo</h1><p class="muted">Servono per calcolare il fabbisogno e segnalarti gli allergeni mentre fai la spesa.</p>' + N.profileForm(N.obDraft || {}, 'onboarding') + '</div>';
+    return '<div class="gate-wrap"><p class="eyebrow">Passo 1 di 3</p><h1>Il tuo profilo</h1><p class="muted">Servono per calcolare il fabbisogno e segnalarti gli allergeni mentre fai la spesa.</p>' + N.profileForm(N.obDraft || {}, 'onboarding') + '</div>';
   };
   N.views.obBasics = function () {
     var staples = N.FOODS.filter(function (f) { return f.staple; });
     var sel = N.obBasics || ['sale', 'olio_evo', 'pepe', 'zucchero', 'origano', 'basilico', 'prezzemolo', 'aceto'];
     N.obBasics = sel;
-    return '<div class="gate-wrap"><p class="eyebrow">Passo 2 di 2</p><h1>Cosa hai sempre in casa?</h1><p class="muted">Le basi contano come disponibili per tutte le ricette. Puoi cambiarle quando vuoi.</p>' +
+    return '<div class="gate-wrap"><p class="eyebrow">Passo 2 di 3</p><h1>Cosa hai sempre in casa?</h1><p class="muted">Le basi contano come disponibili per tutte le ricette. Puoi cambiarle quando vuoi.</p>' +
       '<div class="chips">' + staples.map(function (f) { return chip(f.name, sel.indexOf(f.id) !== -1, 'data-a="ob-basic" data-id="' + f.id + '"'); }).join('') + '</div>' +
-      '<div class="gate-actions"><button class="btn primary block" data-a="ob-finish">Inizia a usare Nutrimi</button></div></div>';
+      '<div class="gate-actions"><button class="btn primary block" data-a="ob-finish">Continua</button></div></div>';
+  };
+  N.views.obNotify = function () {
+    var st = N.push.status();
+    var body = st === 'ios'
+      ? '<p class="muted">Su iPhone le notifiche funzionano con Nutrimi aperta dalla schermata Home: tocca Condividi → <b>Aggiungi alla schermata Home</b>, poi apri l’app da lì. Te le chiederemo al primo avvio.</p>'
+      : st === 'unsupported' ? '<p class="muted">Questo browser non supporta le notifiche. Le scadenze restano evidenziate nella schermata Oggi.</p>'
+        : st === 'denied' ? '<p class="muted">Le notifiche sono bloccate per Nutrimi nelle impostazioni del telefono. Puoi riattivarle da lì quando vuoi.</p>'
+          : '<p class="muted">Alle 9:00 ti avvisiamo quando un prodotto scade entro 3 giorni, con una ricetta per usarlo. Al tocco il telefono ti chiede il permesso: scegli <b>Consenti</b>.</p>';
+    var can = st === 'off';
+    return '<div class="gate-wrap"><p class="eyebrow">Passo 3 di 3</p><h1>Avvisi di scadenza</h1>' +
+      '<div class="card notify-demo"><span class="nd-ic">' + N.IC.bell + '</span><div><b>Zucchine scade domani</b><p class="muted small">Consumale presto. Prova: Frittata di zucchine e menta.</p></div></div>' + body +
+      '<div class="gate-actions">' + (can ? '<button class="btn primary block" data-a="ob-notify">Attiva le notifiche</button><button class="btn ghost block" data-a="ob-done">Più tardi</button>'
+        : '<button class="btn primary block" data-a="ob-done">Inizia a usare Nutrimi</button>') + '</div></div>';
   };
   function logo() { return '<span class="logo"><span class="logo-mark" aria-hidden="true"></span>Nutrimi</span>'; }
   N.logo = logo;
