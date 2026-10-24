@@ -72,7 +72,18 @@ async function allowed(url) {
 }
 
 /* ---------- raccolta degli indirizzi ---------- */
+/* se manca la sitemap, la cerca nel robots.txt del sito (righe "Sitemap:") */
+async function findSitemaps(site) {
+  const txt = await get(new URL('/robots.txt', site).href);
+  return [...txt.matchAll(/^\s*sitemap:\s*(\S+)/gim)].map((m) => m[1]);
+}
 async function urlsFromSitemap(src) {
+  if (!src.sitemap && src.site) {
+    const all = await findSitemaps(src.site);
+    const re = new RegExp(src.sitemapMatch || 'ricett|recipe', 'i');
+    src.sitemap = all.find((u) => re.test(u)) || all[0];
+    if (!src.sitemap) throw new Error('nessuna sitemap nel robots.txt');
+  }
   let xml = await get(src.sitemap);
   if (/<sitemapindex/i.test(xml)) {
     const subs = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map((m) => m[1])
@@ -215,12 +226,13 @@ const rows = [], report = [];
 const max = CFG.maxPerRun || 40;
 for (const src of (CFG.sources || []).filter((s) => s.enabled)) {
   let urls = [...(src.urls || [])];
-  try { if (src.sitemap) urls = urls.concat(await urlsFromSitemap(src)); } catch (e) { report.push(`${src.name}: sitemap non leggibile (${e.message})`); }
-  let taken = 0;
+  try { if (src.sitemap || src.site) { urls = urls.concat(await urlsFromSitemap(src)); report.push(`${src.name}: sitemap ${src.sitemap} · ${urls.length} ricette candidate`); } } catch (e) { report.push(`${src.name}: sitemap non leggibile (${e.message})`); }
+  let taken = 0, tries = 0;
+  if (!urls.length) report.push(`${src.name}: nessun indirizzo di ricetta trovato (controlla "match" in recipe-sources.json)`);
   for (const url of urls) {
-    if (rows.length >= max || taken >= (src.limit || 20)) break;
+    if (rows.length >= max || taken >= (src.limit || 20) || tries >= (src.maxTries || 60)) break;
     if (seen.has(url)) continue;
-    seen.add(url);
+    seen.add(url); tries++;
     await sleep(DELAY);
     try {
       const r = await processUrl(url, src.name);

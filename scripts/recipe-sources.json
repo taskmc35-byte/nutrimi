@@ -3,14 +3,9 @@
   "delayMs": 3000,
   "maxPerRun": 40,
   "sources": [
-    {
-      "name": "Nome del sito",
-      "enabled": false,
-      "sitemap": "https://www.esempio.it/sitemap-ricette.xml",
-      "sitemapMatch": "",
-      "match": "/ricette/",
-      "limit": 20,
-      "urls": []
-    }
+    { "name": "GialloZafferano", "enabled": true, "site": "https://ricette.giallozafferano.it", "sitemapMatch": "ricett", "match": "ricette\\.giallozafferano\\.it/[^/]+\\.html$", "limit": 10, "maxTries": 40, "urls": [] },
+    { "name": "Fatto in casa da Benedetta", "enabled": true, "site": "https://www.fattoincasadabenedetta.it", "sitemapMatch": "ricett", "match": "/ricetta/", "limit": 10, "maxTries": 40, "urls": [] },
+    { "name": "Cookist", "enabled": true, "site": "https://www.cookist.it", "sitemapMatch": "ricett|recipe|post", "match": "cookist\\.it/[^/]+/?$", "limit": 10, "maxTries": 60, "urls": [] },
+    { "name": "Misya", "enabled": true, "site": "https://www.misya.info", "sitemapMatch": "ricett", "match": "/ricetta/", "limit": 10, "maxTries": 40, "urls": [] }
   ]
 }
