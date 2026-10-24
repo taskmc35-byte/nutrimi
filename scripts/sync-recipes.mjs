@@ -118,7 +118,7 @@ async function urlsFromSitemap(src) {
     const all = [...xml.matchAll(/<loc>\s*(?:<!\[CDATA\[)?([^<\s\]]+)/gi)].map((m) => m[1]);
     let subs = all.filter((u) => !src.sitemapMatch || new RegExp(src.sitemapMatch, 'i').test(u));
     if (!subs.length) subs = all; // nessun nome riconoscibile: prova le prime
-    subs = subs.slice(0, src.maxSitemaps || 3);
+    subs = src.newestSitemaps ? subs.slice(-(src.maxSitemaps || 3)).reverse() : subs.slice(0, src.maxSitemaps || 3);
     src._subs = subs;
     xml = '';
     for (const s of subs) { await sleep(DELAY); try { xml += await get(s); } catch { /* sitemap parziale non leggibile */ } }

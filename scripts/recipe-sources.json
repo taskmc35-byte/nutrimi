@@ -26,23 +26,26 @@
     },
     {
       "name": "Cookist",
-      "enabled": true,
+      "enabled": false,
       "site": "https://www.cookist.it",
       "sitemapMatch": "ricett|recipe|post",
       "match": "cookist\\.it/[^/]+/?$",
       "limit": 10,
       "maxTries": 60,
-      "urls": []
+      "urls": [],
+      "nota": "Disattivato: nessuna sitemap pubblica raggiungibile (404)"
     },
     {
       "name": "Misya",
       "enabled": true,
       "site": "https://www.misya.info",
-      "sitemapMatch": "ricett",
-      "match": "/ricetta/",
+      "sitemapMatch": "post-sitemap",
+      "match": "misya\\.info/ricetta/",
       "limit": 10,
       "maxTries": 40,
-      "urls": []
+      "urls": [],
+      "newestSitemaps": true,
+      "maxSitemaps": 2
     }
   ]
 }
