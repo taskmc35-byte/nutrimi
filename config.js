@@ -7,5 +7,5 @@ window.NUTRIMI_CONFIG = {
   supabaseUrl: 'https://sgkwudyqizncipqnjuhk.supabase.co',
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNna3d1ZHlxaXpuY2lwcW5qdWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NzM5OTgsImV4cCI6MjEwODQ0OTk5OH0.t4FgZIhX6i27qaUqxfs-FXcrGKHMU7ahLRwb44rNLl0',
   // Notifiche ad app chiusa: chiave pubblica VAPID (vedi README, sezione Notifiche)
-  vapidPublicKey: ''
+  vapidPublicKey: 'BF1v4MavaRkRD0yyumNrfqlR0JmiNjO7hkXFVIcNIvbcfpx8sXQdWoZe6ewtlQR0uSFat_NZCvxw4_IdcOlEo2k'
 };
