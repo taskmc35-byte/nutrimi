@@ -1,0 +1,16 @@
+{
+  "userAgent": "NutrimiBot/1.0 (app personale di ricette)",
+  "delayMs": 3000,
+  "maxPerRun": 40,
+  "sources": [
+    {
+      "name": "Nome del sito",
+      "enabled": false,
+      "sitemap": "https://www.esempio.it/sitemap-ricette.xml",
+      "sitemapMatch": "",
+      "match": "/ricette/",
+      "limit": 20,
+      "urls": []
+    }
+  ]
+}
