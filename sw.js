@@ -1,5 +1,5 @@
 /* Nutrimi — service worker: l'app si apre anche senza connessione */
-var CACHE = 'nutrimi-v2';
+var CACHE = 'nutrimi-v3';
 var SHELL = ['./', 'index.html', 'config.js', 'css/app.css', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png',
   'js/data/foods.js', 'js/data/recipes.js', 'js/core.js', 'js/cloud.js', 'js/scanner.js', 'js/expiry.js', 'js/views.js', 'js/app.js'];
 

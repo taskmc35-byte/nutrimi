@@ -92,7 +92,7 @@
   C.removePush = async function (endpoint) { await C.sb.from('push_subscriptions').delete().eq('endpoint', endpoint); };
 
   C.subscribe = function () {
-    C.stop();
+    C.unsubscribe();
     var ch = C.sb.channel('casa-' + C.hid);
     N.TABLES.forEach(function (t) {
       ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: t, filter: 'household_id=eq.' + C.hid }, function (p) { apply(t, p.new); });
@@ -115,5 +115,8 @@
     if (i === -1) arr.push(row); else arr[i] = row;
     N.saveLocal(); N.softRender();
   }
-  C.stop = function () { if (C.channel && C.sb) { C.sb.removeChannel(C.channel); C.channel = null; } C.active = false; };
+  /* chiude solo il canale in tempo reale: la sincronizzazione resta attiva */
+  C.unsubscribe = function () { if (C.channel && C.sb) { C.sb.removeChannel(C.channel); C.channel = null; } };
+  /* uscita dall'account: chiude il canale e ferma la sincronizzazione */
+  C.stop = function () { C.unsubscribe(); C.active = false; };
 })();
