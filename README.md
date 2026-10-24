@@ -45,7 +45,7 @@ A questo punto l'app funziona già, con i dati salvati solo su quel telefono.
 1. Crea un account gratuito su supabase.com e un nuovo progetto (regione: Europa).
 2. **SQL Editor → New query**: incolla tutto `supabase/schema.sql` e premi **Run**.
 3. **Authentication → URL Configuration**: in *Site URL* metti l'indirizzo Vercel dell'app.
-4. **Project Settings → API**: copia *Project URL* e la chiave *anon public* dentro `config.js`, poi carica la modifica su GitHub. Vercel ripubblica da solo.
+4. Copia due valori dentro `config.js`. Il *Project URL* lo trovi nel pulsante **Connect** in alto nel progetto. La chiave è in **Project Settings → API Keys**: usa la *anon public* della scheda *Legacy API Keys* oppure la *Publishable key* (`sb_publishable_…`). Poi carica la modifica su GitHub e Vercel ripubblica da solo.
 5. Apri l'app: ora chiede di registrarsi. Dopo la registrazione crei la "casa"; in **Profilo** trovi il codice da dare a chi vive con te, che lo inserisce dopo essersi registrato.
 
 Per default Supabase chiede di confermare l'email alla registrazione. Puoi lasciarlo così o disattivarlo in **Authentication → Providers → Email**.
@@ -57,7 +57,7 @@ Lo script legge dalle pagine delle ricette solo i dati strutturati (titolo, porz
 1. In `scripts/recipe-sources.json` aggiungi i siti da cui importare. Per ogni sito servono la sitemap delle ricette (di solito è indicata in `https://sito/robots.txt` alla riga `Sitemap:`) e un pezzo di indirizzo che distingue le pagine di ricetta (`match`). Metti `"enabled": true`. In alternativa elenca a mano gli indirizzi in `urls`.
 2. Prima di attivare un sito leggi le sue condizioni d'uso.
 3. Prova in locale senza salvare: `node scripts/sync-recipes.mjs --dry --url https://indirizzo-di-una-ricetta`
-4. Su GitHub: **Settings → Secrets and variables → Actions → New repository secret**, aggiungi `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API → *service_role*; questa chiave non va mai in `config.js`).
+4. Su GitHub: **Settings → Secrets and variables → Actions → New repository secret**, aggiungi `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API Keys: la *Secret key* `sb_secret_…` oppure la legacy *service_role*. Questa chiave non va mai in `config.js`).
 5. **Actions → Aggiorna ricette → Run workflow** per la prima esecuzione. Poi parte da sola ogni lunedì.
 
 Vengono importate solo ricette di cui Nutrimi riconosce almeno il 75% degli ingredienti, così i valori nutrizionali sono affidabili. Dolci, bevande e conserve sono esclusi. GitHub sospende le esecuzioni programmate se il repository resta senza modifiche per 60 giorni: basta riattivarle da Actions.

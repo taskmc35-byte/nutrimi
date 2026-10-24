@@ -180,7 +180,8 @@ function buildRecipe(rec, url, sourceName) {
 
 /* ---------- Supabase ---------- */
 const SB = process.env.SUPABASE_URL, KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+// le chiavi nuove (sb_secret_…) vanno solo in apikey; quelle vecchie (service_role, JWT) anche in Authorization
+const sbHeaders = { apikey: KEY, 'Content-Type': 'application/json', ...(String(KEY).startsWith('eyJ') ? { Authorization: `Bearer ${KEY}` } : {}) };
 async function existingUrls() {
   if (DRY) return new Set();
   const res = await fetch(`${SB}/rest/v1/recipes?select=source_url&limit=10000`, { headers: sbHeaders });

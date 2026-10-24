@@ -23,7 +23,8 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome' }).form
 if (romeHour < 9 && !FORCE) { console.log(`In Italia sono le ${romeHour}: aspetto le 9.`); process.exit(0); }
 const daysLeft = (exp) => Math.round((new Date(exp + 'T00:00:00Z') - new Date(today + 'T00:00:00Z')) / 86400000);
 
-const H = { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+// le chiavi nuove (sb_secret_…) vanno solo in apikey; quelle vecchie (service_role, JWT) anche in Authorization
+const H = { apikey: KEY, 'Content-Type': 'application/json', ...(String(KEY).startsWith('eyJ') ? { Authorization: `Bearer ${KEY}` } : {}) };
 async function q(pathAndQuery) {
   const r = await fetch(`${SB}/rest/v1/${pathAndQuery}`, { headers: H });
   if (!r.ok) throw new Error(`${pathAndQuery}: ${r.status} ${await r.text()}`);
