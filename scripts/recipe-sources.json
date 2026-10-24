@@ -3,9 +3,46 @@
   "delayMs": 3000,
   "maxPerRun": 40,
   "sources": [
-    { "name": "GialloZafferano", "enabled": true, "site": "https://ricette.giallozafferano.it", "sitemapMatch": "ricett", "match": "ricette\\.giallozafferano\\.it/[^/]+\\.html$", "limit": 10, "maxTries": 40, "urls": [] },
-    { "name": "Fatto in casa da Benedetta", "enabled": true, "site": "https://www.fattoincasadabenedetta.it", "sitemapMatch": "ricett", "match": "/ricetta/", "limit": 10, "maxTries": 40, "urls": [] },
-    { "name": "Cookist", "enabled": true, "site": "https://www.cookist.it", "sitemapMatch": "ricett|recipe|post", "match": "cookist\\.it/[^/]+/?$", "limit": 10, "maxTries": 60, "urls": [] },
-    { "name": "Misya", "enabled": true, "site": "https://www.misya.info", "sitemapMatch": "ricett", "match": "/ricetta/", "limit": 10, "maxTries": 40, "urls": [] }
+    {
+      "name": "GialloZafferano",
+      "enabled": true,
+      "site": "https://ricette.giallozafferano.it",
+      "sitemapMatch": "ricett",
+      "match": "ricette\\.giallozafferano\\.it/[^/]+\\.html$",
+      "limit": 10,
+      "maxTries": 40,
+      "urls": []
+    },
+    {
+      "name": "Fatto in casa da Benedetta",
+      "enabled": false,
+      "site": "https://www.fattoincasadabenedetta.it",
+      "sitemapMatch": "ricett",
+      "match": "/ricetta/",
+      "limit": 10,
+      "maxTries": 40,
+      "urls": [],
+      "nota": "Disattivato: il sito rifiuta gli accessi automatici (errore 403)"
+    },
+    {
+      "name": "Cookist",
+      "enabled": true,
+      "site": "https://www.cookist.it",
+      "sitemapMatch": "ricett|recipe|post",
+      "match": "cookist\\.it/[^/]+/?$",
+      "limit": 10,
+      "maxTries": 60,
+      "urls": []
+    },
+    {
+      "name": "Misya",
+      "enabled": true,
+      "site": "https://www.misya.info",
+      "sitemapMatch": "ricett",
+      "match": "/ricetta/",
+      "limit": 10,
+      "maxTries": 40,
+      "urls": []
+    }
   ]
 }

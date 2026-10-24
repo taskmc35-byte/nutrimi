@@ -50,39 +50,65 @@ async function get(url) {
 }
 
 /* ---------- robots.txt ---------- */
+/* regole standard: gruppi per User-agent, Allow/Disallow con * e $, vince la regola più lunga */
+function parseRobots(txt) {
+  const groups = []; let cur = null, lastWasAgent = false;
+  for (const raw of String(txt).split('\n')) {
+    const line = raw.split('#')[0].trim(); if (!line) continue;
+    const i = line.indexOf(':'); if (i < 0) continue;
+    const k = line.slice(0, i).trim().toLowerCase(), v = line.slice(i + 1).trim();
+    if (k === 'user-agent') {
+      if (!cur || !lastWasAgent) { cur = { agents: [], rules: [] }; groups.push(cur); }
+      cur.agents.push(v.toLowerCase()); lastWasAgent = true;
+    } else {
+      lastWasAgent = false;
+      if (cur && (k === 'allow' || k === 'disallow')) cur.rules.push({ allow: k === 'allow', path: v });
+    }
+  }
+  const mine = groups.filter((g) => g.agents.some((a) => a.includes('nutrimibot')));
+  const rules = (mine.length ? mine : groups.filter((g) => g.agents.includes('*'))).flatMap((g) => g.rules);
+  return rules.filter((r) => r.path !== '' || r.allow);
+}
+function robotsAllows(rules, pathAndQuery) {
+  let best = null;
+  for (const r of rules) {
+    if (!r.path) continue;
+    const re = new RegExp('^' + r.path.replace(/[.+?^{}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\\\$$|\$$/, '$'));
+    if (re.test(pathAndQuery) && (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.allow))) best = r;
+  }
+  return !best || best.allow;
+}
 const robotsCache = new Map();
+async function robotsFor(origin) {
+  if (!robotsCache.has(origin)) {
+    let txt = '';
+    try { txt = await get(origin + '/robots.txt'); } catch { txt = ''; }
+    robotsCache.set(origin, { rules: parseRobots(txt), sitemaps: [...txt.matchAll(/^\s*sitemap:\s*(\S+)/gim)].map((m) => m[1]) });
+  }
+  return robotsCache.get(origin);
+}
 async function allowed(url) {
   const u = new URL(url);
-  if (!robotsCache.has(u.origin)) {
-    let rules = [];
-    try {
-      const txt = await get(u.origin + '/robots.txt');
-      let applies = false;
-      for (const raw of txt.split('\n')) {
-        const line = raw.split('#')[0].trim(); if (!line) continue;
-        const [k, ...v] = line.split(':'); const val = v.join(':').trim();
-        if (/^user-agent$/i.test(k)) applies = val === '*' || /nutrimibot/i.test(val);
-        else if (applies && /^disallow$/i.test(k) && val) rules.push(val);
-      }
-    } catch { rules = []; }
-    robotsCache.set(u.origin, rules);
-  }
-  const p = u.pathname + u.search;
-  return !robotsCache.get(u.origin).some((r) => p.startsWith(r.replace(/\*.*$/, '')));
+  return robotsAllows((await robotsFor(u.origin)).rules, u.pathname + u.search);
 }
 
 /* ---------- raccolta degli indirizzi ---------- */
-/* se manca la sitemap, la cerca nel robots.txt del sito (righe "Sitemap:") */
+/* se manca la sitemap: righe "Sitemap:" del robots.txt, poi gli indirizzi più comuni */
 async function findSitemaps(site) {
-  const txt = await get(new URL('/robots.txt', site).href);
-  return [...txt.matchAll(/^\s*sitemap:\s*(\S+)/gim)].map((m) => m[1]);
+  const origin = new URL(site).origin, r = await robotsFor(origin);
+  if (r.sitemaps.length) return r.sitemaps;
+  const found = [];
+  for (const p of ['/sitemap_index.xml', '/sitemap.xml', '/wp-sitemap.xml', '/sitemap-index.xml']) {
+    try { const x = await get(origin + p); if (/<(urlset|sitemapindex)/i.test(x)) { found.push(origin + p); break; } } catch { /* prova il prossimo */ }
+  }
+  return found;
 }
 async function urlsFromSitemap(src) {
   if (!src.sitemap && src.site) {
     const all = await findSitemaps(src.site);
     const re = new RegExp(src.sitemapMatch || 'ricett|recipe', 'i');
     src.sitemap = all.find((u) => re.test(u)) || all[0];
-    if (!src.sitemap) throw new Error('nessuna sitemap nel robots.txt');
+    if (!src.sitemap) throw new Error('nessuna sitemap trovata (né nel robots.txt né agli indirizzi standard)');
   }
   let xml = await get(src.sitemap);
   if (/<sitemapindex/i.test(xml)) {
