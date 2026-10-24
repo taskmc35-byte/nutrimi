@@ -98,9 +98,12 @@ async function findSitemaps(site) {
   const origin = new URL(site).origin, r = await robotsFor(origin);
   if (r.sitemaps.length) return r.sitemaps;
   const found = [];
-  for (const p of ['/sitemap_index.xml', '/sitemap.xml', '/wp-sitemap.xml', '/sitemap-index.xml']) {
-    try { const x = await get(origin + p); if (/<(urlset|sitemapindex)/i.test(x)) { found.push(origin + p); break; } } catch { /* prova il prossimo */ }
+  const tried = [];
+  for (const p of ['/sitemap_index.xml', '/sitemap.xml', '/wp-sitemap.xml', '/sitemap-index.xml', '/post-sitemap.xml', '/sitemap/sitemap.xml', '/sitemaps/sitemap.xml']) {
+    try { const x = await get(origin + p); if (/<(urlset|sitemapindex)/i.test(x)) { found.push(origin + p); break; } tried.push(p + ' non è una sitemap'); }
+    catch (e) { tried.push(String(e.message).split(' ')[0] + ' ' + p); }
   }
+  if (!found.length) throw new Error('nessuna sitemap trovata; provati: ' + tried.join(', '));
   return found;
 }
 async function urlsFromSitemap(src) {
@@ -111,16 +114,21 @@ async function urlsFromSitemap(src) {
     if (!src.sitemap) throw new Error('nessuna sitemap trovata (né nel robots.txt né agli indirizzi standard)');
   }
   let xml = await get(src.sitemap);
-  if (/<sitemapindex/i.test(xml)) {
-    const subs = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map((m) => m[1])
-      .filter((u) => !src.sitemapMatch || new RegExp(src.sitemapMatch).test(u)).slice(0, src.maxSitemaps || 3);
+  for (let depth = 0; depth < 2 && /<sitemapindex/i.test(xml); depth++) {
+    const all = [...xml.matchAll(/<loc>\s*(?:<!\[CDATA\[)?([^<\s\]]+)/gi)].map((m) => m[1]);
+    let subs = all.filter((u) => !src.sitemapMatch || new RegExp(src.sitemapMatch, 'i').test(u));
+    if (!subs.length) subs = all; // nessun nome riconoscibile: prova le prime
+    subs = subs.slice(0, src.maxSitemaps || 3);
+    src._subs = subs;
     xml = '';
-    for (const s of subs) { await sleep(DELAY); xml += await get(s); }
+    for (const s of subs) { await sleep(DELAY); try { xml += await get(s); } catch { /* sitemap parziale non leggibile */ } }
   }
-  const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/gi)].map((m) => ({
-    loc: (m[1].match(/<loc>\s*([^<\s]+)/i) || [])[1],
+  const raw = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/gi)].map((m) => ({
+    loc: (m[1].match(/<loc>\s*(?:<!\[CDATA\[)?([^<\s\]]+)/i) || [])[1],
     lastmod: (m[1].match(/<lastmod>\s*([^<\s]+)/i) || [])[1] || ''
-  })).filter((e) => e.loc && (!src.match || new RegExp(src.match).test(e.loc)));
+  }));
+  const entries = raw.filter((e) => e.loc && (!src.match || new RegExp(src.match).test(e.loc)));
+  if (!entries.length) src._sample = raw.slice(0, 3).map((e) => e.loc).concat(src._subs ? ['sotto-sitemap lette: ' + src._subs.join(' ')] : []);
   entries.sort((a, b) => b.lastmod.localeCompare(a.lastmod));
   return entries.map((e) => e.loc);
 }
@@ -254,7 +262,7 @@ for (const src of (CFG.sources || []).filter((s) => s.enabled)) {
   let urls = [...(src.urls || [])];
   try { if (src.sitemap || src.site) { urls = urls.concat(await urlsFromSitemap(src)); report.push(`${src.name}: sitemap ${src.sitemap} · ${urls.length} ricette candidate`); } } catch (e) { report.push(`${src.name}: sitemap non leggibile (${e.message})`); }
   let taken = 0, tries = 0;
-  if (!urls.length) report.push(`${src.name}: nessun indirizzo di ricetta trovato (controlla "match" in recipe-sources.json)`);
+  if (!urls.length) report.push(`${src.name}: nessun indirizzo di ricetta trovato` + (src._sample && src._sample.length ? ` — esempi nella sitemap: ${src._sample.join(' | ')}` : ''));
   for (const url of urls) {
     if (rows.length >= max || taken >= (src.limit || 20) || tries >= (src.maxTries || 60)) break;
     if (seen.has(url)) continue;
