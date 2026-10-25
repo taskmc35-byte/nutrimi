@@ -3,6 +3,7 @@
   var N = window.N;
   var $ = function (s) { return document.querySelector(s); };
   N.tab = 'oggi';
+  try { var qt = new URLSearchParams(location.search).get('tab'); if (['oggi', 'spesa', 'dispensa', 'ricette', 'profilo'].indexOf(qt) !== -1) N.tab = qt; } catch (e) { }
   N.gate = null; // schermata di accesso/onboarding attiva
 
   /* ---------- render ---------- */
