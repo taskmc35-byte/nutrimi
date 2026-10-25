@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.nutrimi.twa",
+    "sha256_cert_fingerprints": ["D6:9C:E9:C6:20:45:F8:25:FD:76:A1:04:04:B2:B0:7C:79:C1:54:47:B0:32:66:ED:17:53:6E:3F:7D:1E:19:1C"]
+  }
+}]
