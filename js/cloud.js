@@ -75,15 +75,26 @@
     N.saveLocal();
   };
 
+  /* le modifiche che non arrivano al server restano in coda e si riprovano */
+  var pending = {};
+  C.pendingCount = function () { return Object.keys(pending).length; };
+  function run(key, op) {
+    pending[key] = op; N.syncState('saving');
+    return op().then(function (r) {
+      if (r && r.error) throw r.error;
+      if (pending[key] === op) delete pending[key];
+      N.syncState('ok');
+    }).catch(function (err) { N.syncState('error', err); });
+  }
   C.upsert = function (table, row) {
-    N.syncState('saving');
-    C.sb.from(table).upsert({ id: row.id, household_id: C.hid, data: row, updated_at: new Date().toISOString() })
-      .then(function (r) { N.syncState(r.error ? 'error' : 'ok', r.error); });
+    var copy = JSON.parse(JSON.stringify(row));
+    run(table + ':' + row.id, function () { return C.sb.from(table).upsert({ id: copy.id, household_id: C.hid, data: copy, updated_at: new Date().toISOString() }); });
   };
   C.remove = function (table, id) {
-    N.syncState('saving');
-    C.sb.from(table).delete().eq('id', id).then(function (r) { N.syncState(r.error ? 'error' : 'ok', r.error); });
+    run(table + ':' + id, function () { return C.sb.from(table).delete().eq('id', id); });
   };
+  C.retry = function () { Object.keys(pending).forEach(function (k) { run(k, pending[k]); }); };
+  window.addEventListener('online', function () { if (C.active && C.pendingCount()) C.retry(); });
 
   C.savePush = async function (sub) {
     var r = await C.sb.from('push_subscriptions').upsert({ endpoint: sub.endpoint, user_id: C.user.id, household_id: C.hid, sub: sub });

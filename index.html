@@ -24,11 +24,18 @@
     <header class="top">
       <button class="logo" data-a="tab" data-tab="oggi" aria-label="Nutrimi, vai a Oggi"><span class="logo-mark" aria-hidden="true"></span>Nutrimi</button>
       <div class="top-r">
-        <span id="sync" hidden data-s="ok" title="Sincronizzato"></span>
+        <button id="sync" hidden data-s="ok" data-a="sync-retry" disabled aria-label="Salvato online"><i aria-hidden="true"></i><span class="sync-txt">Salvato</span></button>
         <button id="avatar" data-a="avatar" aria-label="Profilo">?</button>
       </div>
     </header>
-    <main id="view" aria-live="polite"></main>
+    <main id="view">
+      <div class="boot" aria-busy="true" aria-label="Caricamento di Nutrimi">
+        <div class="sk sk-eyebrow"></div><div class="sk sk-title"></div>
+        <div class="sk sk-card"></div>
+        <div class="sk sk-line"></div>
+        <div class="sk-row"><div class="sk sk-tile"></div><div class="sk sk-tile"></div></div>
+      </div>
+    </main>
   </div>
 
   <nav class="tabs" aria-label="Sezioni">

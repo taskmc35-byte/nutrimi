@@ -30,7 +30,7 @@
 
   var MONTHS = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
   var DAYS = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
-  function longDate() { var d = new Date(); return DAYS[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+  function longDate() { var d = new Date(), t = DAYS[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()]; return t.charAt(0).toUpperCase() + t.slice(1); }
   function goalLabel(g) { var x = N.GOALS.find(function (a) { return a[0] === g; }); return x ? x[1] : 'Mantenere'; }
 
   /* ---------- componenti ---------- */
@@ -325,7 +325,7 @@
     var C = N.cloud, h = '<section class="card account"><h2>Account e dati</h2>';
     if (C.active) {
       h += '<p class="acc-line">' + N.IC.cloud + '<span>Account online <b>' + esc(C.user.email) + '</b></span></p>' +
-        '<div class="code-box"><span class="muted small">Codice casa da condividere</span><span class="code num" id="house-code">' + esc(C.household ? C.household.invite_code : '—') + '</span>' +
+        '<div class="code-box"><span class="muted small">Codice casa da condividere</span><span class="code num" id="house-code">' + esc(C.household ? C.household.invite_code : 'Non disponibile') + '</span>' +
         '<button class="btn small" data-a="copy-code">Copia</button></div>' +
         '<p class="muted small">Chi crea un account Nutrimi e inserisce questo codice vede la stessa lista della spesa e la stessa dispensa, aggiornate in tempo reale.</p>' +
         '<div class="row-actions"><button class="btn ghost" data-a="logout">Esci</button></div>';
@@ -379,9 +379,16 @@
       otherAvoid: g('pf-other').split(',').map(function (s) { return s.trim(); }).filter(Boolean),
       custom: { kcal: +g('pf-c-kcal') || 0, p: +g('pf-c-p') || 0, c: +g('pf-c-c') || 0, f: +g('pf-c-f') || 0 }
     };
-    var err = !p.name ? 'Inserisci il nome.' : !p.age ? 'Inserisci l’età.' : !p.weight ? 'Inserisci il peso in kg.' : !p.height ? 'Inserisci l’altezza in cm.' :
-      (p.goal === 'personalizzato' && !p.custom.kcal) ? 'Con l’obiettivo personalizzato indica almeno le kcal giornaliere.' : '';
-    return { p: p, err: err };
+    var checks = [
+      [!p.name, 'pf-name', 'Inserisci il nome.'],
+      [!p.age || p.age < 10 || p.age > 110, 'pf-age', 'Inserisci un’età tra 10 e 110 anni.'],
+      [!p.weight || p.weight < 25 || p.weight > 300, 'pf-weight', 'Inserisci il peso in kg, tra 25 e 300.'],
+      [!p.height || p.height < 100 || p.height > 230, 'pf-height', 'Inserisci l’altezza in cm, tra 100 e 230.'],
+      [p.goal === 'personalizzato' && !p.custom.kcal, 'pf-c-kcal', 'Con l’obiettivo personalizzato indica almeno le kcal al giorno.']
+    ];
+    var bad = checks.find(function (c) { return c[0]; });
+    if (bad && bad[1] === 'pf-c-kcal') { var d = form.querySelector('details.custom'); if (d) d.open = true; }
+    return { p: p, err: bad ? bad[2] : '', field: bad ? bad[1] : null };
   };
 
   /* ====================================================== ONBOARDING / ACCESSO */
@@ -526,7 +533,7 @@
     return h;
   };
   function foodMatch(i) {
-    return '<label class="field"><span>Per le ricette conta come</span><select id="edit-food"><option value="">— nessun alimento —</option>' +
+    return '<label class="field"><span>Per le ricette conta come</span><select id="edit-food"><option value="">Nessun alimento</option>' +
       N.CATS.map(function (c) {
         var fs = N.FOODS.filter(function (f) { return f.cat === c; }); if (!fs.length) return '';
         return '<optgroup label="' + esc(c) + '">' + fs.map(function (f) { return '<option value="' + f.id + '"' + (i.foodId === f.id ? ' selected' : '') + '>' + esc(f.name) + '</option>'; }).join('') + '</optgroup>';

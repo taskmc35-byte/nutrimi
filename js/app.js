@@ -23,23 +23,83 @@
     if (id) { var el = document.getElementById(id); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) { } } }
     if (!$('#sheet').hidden) N.refreshSheet();
   };
-  N.go = function (tab) { N.tab = tab; N.render(); window.scrollTo(0, 0); };
+  /* Cronologia: il tasto Indietro (Android, browser) chiude prima la finestra aperta,
+     poi torna alla scheda Oggi, e solo da Oggi esce dall'app. */
+  var H = { ready: false, overlays: 0, closingAll: 0, target: null, after: null };
+  function hstate() { return history.state || {}; }
+  N.go = function (tab, fromHistory) {
+    var prev = N.tab; N.tab = tab; N.render(); window.scrollTo(0, 0);
+    if (fromHistory || !H.ready || N.gate || prev === tab) return;
+    try {
+      if (tab === 'oggi') { if (hstate().nmTab && hstate().nmTab !== 'oggi') history.back(); }
+      else if (!hstate().nmTab || hstate().nmTab === 'oggi') history.pushState({ nmTab: tab }, '');
+      else history.replaceState({ nmTab: tab }, '');
+    } catch (e) { }
+  };
+  N.pushOverlay = function (kind) {
+    try { history.pushState({ nmTab: N.tab, nmOverlay: kind }, ''); H.overlays++; } catch (e) { }
+  };
+  /* chiude n livelli passando dalla cronologia, così Indietro e pulsanti restano allineati */
+  N.popOverlays = function (n, target, after) {
+    if (H.overlays >= n && n > 0) { H.closingAll = n; H.target = target; H.after = after || null; history.go(-n); return true; }
+    return false;
+  };
+  window.addEventListener('popstate', function (e) {
+    var st = e.state || {};
+    if (H.closingAll) {
+      H.overlays = Math.max(0, H.overlays - H.closingAll); H.closingAll = 0;
+      var target = H.target, after = H.after; H.target = H.after = null;
+      if (target === 'scanner') closeScannerNow(); else if (sheetFn) closeSheetNow();
+      if (after) after();
+      return;
+    }
+    if (!$('#scanner').hidden) { H.overlays = Math.max(0, H.overlays - 1); closeScannerNow(); return; }
+    if (!$('#sheet').hidden && sheetFn) {
+      H.overlays = Math.max(0, H.overlays - 1);
+      if (sheetStack.length) { var prev = sheetStack.pop(); sheetFn = prev[0]; N.sheetCtx = prev[1]; N.refreshSheet(); focusSheet(); }
+      else closeSheetNow();
+      return;
+    }
+    if (N.gate) return;
+    var t = st.nmTab || 'oggi';
+    if (t !== N.tab) N.go(t, true);
+  });
 
+  var lastSync = 'ok';
   N.syncState = function (s, err) {
     var el = $('#sync'); if (!el) return;
+    var pending = N.cloud && N.cloud.pendingCount ? N.cloud.pendingCount() : 0;
+    if (s === 'ok' && pending) s = 'error';
     el.dataset.s = s;
-    el.title = s === 'error' ? 'Errore di sincronizzazione' + (err && err.message ? ': ' + err.message : '') : s === 'saving' ? 'Salvataggio…' : 'Sincronizzato';
-    if (s === 'error') N.toast('Non riesco a salvare online. Controlla la connessione.');
+    var label = s === 'error' ? 'Non salvato' : s === 'saving' ? 'Salvataggio' : 'Salvato';
+    el.querySelector('.sync-txt').textContent = label;
+    el.setAttribute('aria-label', s === 'error' ? 'Modifiche non salvate online. Tocca per riprovare' : label + ' online');
+    el.disabled = s !== 'error';
+    if (s === 'error' && lastSync !== 'error') N.toast('Non riesco a salvare online. Le modifiche restano su questo telefono: tocca "Non salvato" per riprovare.');
+    lastSync = s;
   };
 
   /* ---------- fogli ---------- */
-  N.sheetCtx = null; var sheetFn = null, sheetStack = [];
+  N.sheetCtx = null; var sheetFn = null, sheetStack = [], opener = null;
+  function setInert(on, except) {
+    ['.app', '.tabs', '#sheet', '#scanner'].forEach(function (s) {
+      var el = $(s); if (!el || el === except) return;
+      if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert');
+    });
+  }
+  function focusSheet() {
+    var h = $('#sheet-body h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  }
   N.openSheet = function (name, ctx, push) {
+    var wasOpen = !!sheetFn;
     if (push && sheetFn) sheetStack.push([sheetFn, N.sheetCtx]); else sheetStack = [];
+    if (!wasOpen) opener = document.activeElement;
     sheetFn = name; N.sheetCtx = ctx || {};
     var sh = $('#sheet'); sh.hidden = false; document.body.classList.add('sheet-open');
+    setInert(true, sh);
     N.refreshSheet(); $('#sheet-body').scrollTop = 0;
-    requestAnimationFrame(function () { sh.classList.add('in'); });
+    if (!wasOpen || push) N.pushOverlay('sheet'); else { try { history.replaceState(history.state, ''); } catch (e) { } }
+    requestAnimationFrame(function () { sh.classList.add('in'); focusSheet(); });
   };
   N.refreshSheet = function () {
     var body = $('#sheet-body'), y = body.scrollTop, ed = $('#exp-d'), keep = ed ? ed.value : null;
@@ -49,16 +109,37 @@
     if (keep != null && $('#exp-d')) $('#exp-d').value = keep;
   };
   function readExp() { var e = $('#exp-d'); return e && e.value ? e.value : null; }
-  N.closeSheet = function () {
+  function closeSheetNow() {
     var sh = $('#sheet'); sh.classList.remove('in'); document.body.classList.remove('sheet-open');
     sheetFn = null; sheetStack = [];
+    setInert(false);
     setTimeout(function () { if (!sheetFn) sh.hidden = true; }, 220);
+    var back = opener; opener = null;
+    if (back && document.contains(back)) back.focus({ preventScroll: true });
+    else { var h = $('#view h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
+  }
+  N.closeSheet = function () {
+    if (!sheetFn) return;
+    if (!N.popOverlays(1 + sheetStack.length, 'sheet')) closeSheetNow();
   };
   N.sheetBack = function () {
-    var prev = sheetStack.pop();
-    if (!prev) return N.closeSheet();
-    sheetFn = prev[0]; N.sheetCtx = prev[1]; N.refreshSheet();
+    if (!sheetStack.length) return N.closeSheet();
+    if (H.overlays > 0) { history.back(); return; }
+    var prev = sheetStack.pop(); sheetFn = prev[0]; N.sheetCtx = prev[1]; N.refreshSheet(); focusSheet();
   };
+  /* scanner a tutto schermo */
+  var scanOpener = null;
+  function closeScannerNow() { N.scanner.close(); setInert(false); if (sheetFn) setInert(true, $('#sheet')); if (scanOpener && document.contains(scanOpener)) scanOpener.focus(); scanOpener = null; }
+  N.openScanner = function (onCode) {
+    scanOpener = document.activeElement;
+    N.scanner.open(function (code) {
+      var go = function () { onCode(code); };
+      if (!N.popOverlays(1, 'scanner', go)) { closeScannerNow(); go(); }
+    });
+    setInert(true, $('#scanner')); N.pushOverlay('scanner');
+    setTimeout(function () { var x = $('#scan-code'); if (x) x.focus(); }, 50);
+  };
+  N.closeScanner = function () { if (!N.popOverlays(1, 'scanner')) closeScannerNow(); };
 
   /* ---------- toast ---------- */
   var toastT = null;
@@ -160,9 +241,10 @@
   // SCANNER
   A.scan = function (el) {
     var target = el.dataset.for;
-    N.scanner.open(function (code) { handleCode(code, target); });
+    N.openScanner(function (code) { handleCode(code, target); });
   };
-  A['scan-close'] = function () { N.scanner.close(); };
+  A['scan-close'] = function () { N.closeScanner(); };
+  A['sync-retry'] = function () { if (N.cloud.retry) N.cloud.retry(); };
   async function handleCode(code, target) {
     N.toast('Cerco il prodotto ' + code + '…');
     try {
@@ -391,7 +473,18 @@
     var f = e.target; e.preventDefault();
     if (f.id === 'pform') {
       var res = N.readProfileForm(f), err = f.querySelector('#pf-err');
-      if (res.err) { err.textContent = res.err; err.hidden = false; return; }
+      f.querySelectorAll('.field-err').forEach(function (x) { x.remove(); });
+      f.querySelectorAll('[aria-invalid]').forEach(function (x) { x.removeAttribute('aria-invalid'); x.removeAttribute('aria-describedby'); });
+      if (res.err) {
+        var input = res.field && f.querySelector('#' + res.field);
+        if (input) {
+          var p = document.createElement('p'); p.className = 'field-err'; p.id = res.field + '-err'; p.textContent = res.err;
+          input.setAttribute('aria-invalid', 'true'); input.setAttribute('aria-describedby', p.id);
+          input.insertAdjacentElement('afterend', p); input.focus();
+          err.hidden = true;
+        } else { err.textContent = res.err; err.hidden = false; }
+        return;
+      }
       err.hidden = true;
       if (f.dataset.mode === 'edit') {
         var p = N.S.profiles.find(function (x) { return x.id === f.dataset.id; });
@@ -449,7 +542,18 @@
       e.preventDefault(); var first = document.querySelector('#shop-sugg [data-a="shop-pick"]');
       if (first) first.click(); else A['shop-free']();
     }
-    if (e.key === 'Escape') { if (!$('#scanner').hidden) N.scanner.close(); else if (!$('#sheet').hidden) N.closeSheet(); }
+    if (e.key === 'Escape') { if (!$('#scanner').hidden) N.closeScanner(); else if (!$('#sheet').hidden) N.closeSheet(); }
+    // fuoco trattenuto nella finestra aperta (riserva per i browser senza "inert")
+    if (e.key === 'Tab') {
+      var box = !$('#scanner').hidden ? $('#scanner') : (!$('#sheet').hidden ? $('#sheet .sheet-panel') : null);
+      if (!box) return;
+      var f = [].filter.call(box.querySelectorAll('button:not([disabled]), a[href], input:not([type=hidden]):not([hidden]), select, textarea, [tabindex]:not([tabindex="-1"])'), function (x) { return x.offsetParent !== null || x.getClientRects().length; });
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (!box.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
   document.addEventListener('submit', onSubmit);
   $('#scan-form').addEventListener('submit', function (e) { e.preventDefault(); N.scanner.submit($('#scan-code').value); });
@@ -457,6 +561,8 @@
   /* ---------- avvio ---------- */
   N.boot = async function () {
     N.gate = null;
+    try { history.replaceState({ nmTab: 'oggi' }, ''); if (N.tab !== 'oggi') history.pushState({ nmTab: N.tab }, ''); } catch (e) { }
+    H.ready = true; H.overlays = 0;
     if (N.cloud.configured()) {
       $('#sync').hidden = false;
       try {
