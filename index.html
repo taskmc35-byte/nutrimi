@@ -20,6 +20,33 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+  <div id="intro" class="intro" aria-hidden="true">
+    <div class="intro-in">
+      <svg class="intro-mark" viewBox="0 0 1024 1024" width="168" height="168">
+        <g class="intro-stems">
+          <rect x="300" y="290" width="104" height="444" rx="52" fill="#EAF0FA"/>
+          <rect x="620" y="290" width="104" height="444" rx="52" fill="#EAF0FA"/>
+        </g>
+        <g class="intro-leaf">
+          <g transform="translate(512 512) rotate(44.55)">
+            <path d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z" fill="#FFC83D" stroke="#0B1630" stroke-width="24" stroke-linejoin="round" paint-order="stroke"/>
+            <path d="M-148.2 0 Q 0 -8 152.7 0" fill="none" stroke="#0A1427" stroke-width="14" stroke-linecap="round"/>
+          </g>
+        </g>
+      </svg>
+      <span class="intro-word">Nutrimi</span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var el = document.getElementById('intro'); if (!el) return;
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var done = false;
+      function hide() { if (done) return; done = true; el.classList.add('out'); setTimeout(function () { el.remove(); }, 320); }
+      el.addEventListener('click', hide);
+      setTimeout(hide, reduce ? 700 : 1900);
+    })();
+  </script>
   <div class="app">
     <header class="top">
       <button class="logo" data-a="tab" data-tab="oggi" aria-label="Nutrimi, vai a Oggi"><span class="logo-mark" aria-hidden="true"></span>Nutrimi</button>

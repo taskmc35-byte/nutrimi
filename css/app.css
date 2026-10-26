@@ -556,3 +556,25 @@ body.gated .toast { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 .pad { padding: 10px; }
 .field textarea { width: 100%; border-radius: 12px; border: 1px solid var(--line-2); background: var(--bg-3); padding: 12px 13px; font: 15px/1.45 var(--font-body); color: var(--fg); resize: vertical; outline: none; }
 .field textarea:focus { border-color: var(--blue); }
+
+/* ---------- intro con la foglia che cade ---------- */
+.intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; cursor: pointer;
+  background: radial-gradient(120% 80% at 28% 18%, #17306A 0%, #0B1630 50%, #05080F 100%); transition: opacity .3s ease; }
+.intro.out { opacity: 0; pointer-events: none; }
+.intro-in { display: flex; flex-direction: column; align-items: center; gap: 18px; transform: translateY(-4vh); }
+.intro-mark { overflow: visible; }
+.intro-stems { transform-box: view-box; transform-origin: 512px 734px; animation: intro-stems .45s cubic-bezier(.2,.8,.2,1) both; }
+.intro-leaf { transform-box: view-box; transform-origin: 512px 512px; animation: intro-fall 1.25s .2s both; }
+.intro-word { font-family: var(--font-display); font-weight: 750; font-size: 40px; letter-spacing: -.02em; color: #EAF0FA; animation: intro-word .4s 1.4s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes intro-stems { from { opacity: 0; transform: scaleY(.6); } to { opacity: 1; transform: none; } }
+@keyframes intro-fall {
+  0%   { opacity: 0; transform: translate(-70px, -640px) rotate(-75deg); animation-timing-function: ease-in-out; }
+  12%  { opacity: 1; }
+  34%  { transform: translate(85px, -400px) rotate(28deg); animation-timing-function: ease-in-out; }
+  58%  { transform: translate(-50px, -170px) rotate(-26deg); animation-timing-function: ease-in-out; }
+  80%  { transform: translate(18px, -30px) rotate(9deg); animation-timing-function: ease-out; }
+  92%  { transform: translate(-4px, 6px) rotate(-2deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes intro-word { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .intro-stems, .intro-leaf, .intro-word { animation: none; } }

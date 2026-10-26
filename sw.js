@@ -1,5 +1,5 @@
 /* Nutrimi — service worker: l'app si apre anche senza connessione */
-var CACHE = 'nutrimi-v8';
+var CACHE = 'nutrimi-v9';
 var SHELL = ['./', 'index.html', 'config.js', 'css/app.css', 'manifest.webmanifest', 'icons/icon.svg', 'icons/mark.svg', 'icons/icon-192.png',
   'icons/ui/home.png', 'icons/ui/cart.png', 'icons/ui/jar.png', 'icons/ui/pot.png', 'icons/ui/user.png', 'icons/ui/scan.png', 'icons/ui/plus.png', 'icons/ui/minus.png', 'icons/ui/check.png', 'icons/ui/x.png', 'icons/ui/trash.png', 'icons/ui/search.png', 'icons/ui/alert.png', 'icons/ui/clock.png', 'icons/ui/link.png', 'icons/ui/chev.png', 'icons/ui/leaf.png', 'icons/ui/cloud.png', 'icons/ui/phone.png', 'icons/ui/bell.png', 'icons/ui/camera.png',
   'js/data/foods.js', 'js/data/recipes.js', 'js/core.js', 'js/cloud.js', 'js/scanner.js', 'js/expiry.js', 'js/views.js', 'js/diary.js', 'js/app.js'];
