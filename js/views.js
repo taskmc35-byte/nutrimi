@@ -2,31 +2,13 @@
 (function () {
   var N = window.N, esc = N.esc;
 
-  /* ---------- icone ---------- */
-  function ic(d, extra) { return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" ' + (extra || '') + '>' + d + '</svg>'; }
-  N.IC = {
-    home: ic('<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-5.5h4V20"/>'),
-    cart: ic('<path d="M3 4h2.2l2.3 11.2h10.8L20.5 7H6.4"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/>'),
-    jar: ic('<path d="M8 3h8v3H8z"/><path d="M7 6h10a1 1 0 0 1 1 1v12.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19.5V7a1 1 0 0 1 1-1Z"/><path d="M6 11h12M6 16h12"/>'),
-    pot: ic('<path d="M4 10h16v6.5A3.5 3.5 0 0 1 16.5 20h-9A3.5 3.5 0 0 1 4 16.5Z"/><path d="M2 10h20M9 6.5c0-1 1-1.2 1-2.2M13 6.5c0-1 1-1.2 1-2.2"/>'),
-    user: ic('<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.7 3.9-5.7 7.5-5.7s6.6 2 7.5 5.7"/>'),
-    scan: ic('<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M8 8v8M11 8v8M14 8v8M17 8v8" stroke-width="1.4"/>'),
-    plus: ic('<path d="M12 5v14M5 12h14"/>'),
-    minus: ic('<path d="M5 12h14"/>'),
-    check: ic('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
-    x: ic('<path d="M6 6l12 12M18 6 6 18"/>'),
-    trash: ic('<path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>'),
-    search: ic('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'),
-    alert: ic('<path d="M12 4 2.8 19.5h18.4Z"/><path d="M12 10v4.5M12 17.2v.3"/>'),
-    clock: ic('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
-    link: ic('<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4.5A1.5 1.5 0 0 1 16.5 20h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/>'),
-    chev: ic('<path d="m9 6 6 6-6 6"/>'),
-    leaf: ic('<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19 13 11"/>'),
-    cloud: ic('<path d="M7 18.5h10.5a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7.3 9.3 4.6 4.6 0 0 0 7 18.5Z"/>'),
-    bell: ic('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
-    camera: ic('<path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.5-2h5.4l1.5 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z"/><circle cx="12" cy="13" r="3.4"/>'),
-    phone: ic('<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 17.5h2"/>')
-  };
+  /* ---------- icone ----------
+     Set Icons8 "Pulsar Line" (vedi icons8.json), PNG in icons/ui/.
+     La PNG fa da maschera: il colore arriva da currentColor via CSS. */
+  function ic(name) { return '<i class="ic" data-i="' + name + '" aria-hidden="true"></i>'; }
+  N.IC = {};
+  ['home', 'cart', 'jar', 'pot', 'user', 'scan', 'plus', 'minus', 'check', 'x', 'trash', 'search', 'alert',
+    'clock', 'link', 'chev', 'leaf', 'cloud', 'phone', 'bell', 'camera'].forEach(function (k) { N.IC[k] = ic(k); });
 
   var MONTHS = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
   var DAYS = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
@@ -305,6 +287,7 @@
     h += N.profileForm(p, 'edit');
     if (p.id !== N.S.meId) h += '<div class="row-actions"><button class="btn ghost" data-a="set-me" data-id="' + p.id + '">Questa persona sono io</button><button class="btn danger ghost" data-a="del-person" data-id="' + p.id + '">' + N.IC.trash + 'Elimina</button></div>';
     h += notifyCard() + accountCard();
+    h += '<p class="credits">Crediti · Icone di <a href="https://icons8.com" target="_blank" rel="noopener">Icons8</a></p>';
     return h;
   };
   function notifyCard() {

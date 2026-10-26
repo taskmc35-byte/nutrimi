@@ -1,0 +1,175 @@
+{
+  "version": 2,
+  "icons": {
+    "pack": "pulsar-line",
+    "packName": "Pulsar Line",
+    "sizes": [
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      23
+    ],
+    "color": "currentColor",
+    "delivery": "PNG 96px scaricate da img.icons8.com in icons/ui/<chiave>.png, usate come mask CSS (colore = currentColor)",
+    "license": "Icons8 piano gratuito: attribuzione con link a https://icons8.com obbligatoria (riga Crediti nella pagina Profilo)",
+    "items": {
+      "home": {
+        "id": "OXVih02dFZ53",
+        "commonName": "home",
+        "meaning": "casa",
+        "file": "icons/ui/home.png",
+        "preview": "https://img.icons8.com/?id=OXVih02dFZ53&format=png&size=48"
+      },
+      "cart": {
+        "id": "ySRi3OLgoOJX",
+        "commonName": "shopping-cart",
+        "meaning": "carrello",
+        "file": "icons/ui/cart.png",
+        "preview": "https://img.icons8.com/?id=ySRi3OLgoOJX&format=png&size=48"
+      },
+      "jar": {
+        "id": "d1F7BVHShn7N",
+        "commonName": "mason-jar",
+        "meaning": "barattolo / dispensa",
+        "file": "icons/ui/jar.png",
+        "preview": "https://img.icons8.com/?id=d1F7BVHShn7N&format=png&size=48"
+      },
+      "pot": {
+        "id": "fmRL94TbMBvB",
+        "commonName": "cooking-pot",
+        "meaning": "pentola / ricette",
+        "file": "icons/ui/pot.png",
+        "preview": "https://img.icons8.com/?id=fmRL94TbMBvB&format=png&size=48"
+      },
+      "user": {
+        "id": "AZazdsitsrgg",
+        "commonName": "user",
+        "meaning": "utente",
+        "file": "icons/ui/user.png",
+        "preview": "https://img.icons8.com/?id=AZazdsitsrgg&format=png&size=48"
+      },
+      "scan": {
+        "id": "sBSb4dSUeKJl",
+        "commonName": "barcode-scanner",
+        "meaning": "scanner codice a barre",
+        "file": "icons/ui/scan.png",
+        "preview": "https://img.icons8.com/?id=sBSb4dSUeKJl&format=png&size=48"
+      },
+      "plus": {
+        "id": "FCFeqPfNH4BT",
+        "commonName": "plus-math",
+        "meaning": "più",
+        "file": "icons/ui/plus.png",
+        "preview": "https://img.icons8.com/?id=FCFeqPfNH4BT&format=png&size=48"
+      },
+      "minus": {
+        "id": "jhcd39m4NLpG",
+        "commonName": "minus-math",
+        "meaning": "meno",
+        "file": "icons/ui/minus.png",
+        "preview": "https://img.icons8.com/?id=jhcd39m4NLpG&format=png&size=48"
+      },
+      "check": {
+        "id": "pxhvk0c7eDwO",
+        "commonName": "checkmark",
+        "meaning": "spunta",
+        "file": "icons/ui/check.png",
+        "preview": "https://img.icons8.com/?id=pxhvk0c7eDwO&format=png&size=48"
+      },
+      "x": {
+        "id": "NLT5nBYxPRCV",
+        "commonName": "delete-sign",
+        "meaning": "chiudi",
+        "file": "icons/ui/x.png",
+        "preview": "https://img.icons8.com/?id=NLT5nBYxPRCV&format=png&size=48"
+      },
+      "trash": {
+        "id": "ATzTLrwzRISB",
+        "commonName": "trash",
+        "meaning": "cestino",
+        "file": "icons/ui/trash.png",
+        "preview": "https://img.icons8.com/?id=ATzTLrwzRISB&format=png&size=48"
+      },
+      "search": {
+        "id": "A7j5iYOMBYSv",
+        "commonName": "search",
+        "meaning": "cerca",
+        "file": "icons/ui/search.png",
+        "preview": "https://img.icons8.com/?id=A7j5iYOMBYSv&format=png&size=48"
+      },
+      "alert": {
+        "id": "Ovynh83Kjp1k",
+        "commonName": "error",
+        "meaning": "avviso",
+        "file": "icons/ui/alert.png",
+        "preview": "https://img.icons8.com/?id=Ovynh83Kjp1k&format=png&size=48"
+      },
+      "clock": {
+        "id": "YKJRubqbjHsc",
+        "commonName": "clock",
+        "meaning": "orologio",
+        "file": "icons/ui/clock.png",
+        "preview": "https://img.icons8.com/?id=YKJRubqbjHsc&format=png&size=48"
+      },
+      "link": {
+        "id": "Ka8CstC3M6mR",
+        "commonName": "external-link",
+        "meaning": "link esterno",
+        "file": "icons/ui/link.png",
+        "preview": "https://img.icons8.com/?id=Ka8CstC3M6mR&format=png&size=48"
+      },
+      "chev": {
+        "id": "gllDEJ9mWQZd",
+        "commonName": "forward",
+        "meaning": "freccia destra",
+        "file": "icons/ui/chev.png",
+        "preview": "https://img.icons8.com/?id=gllDEJ9mWQZd&format=png&size=48"
+      },
+      "leaf": {
+        "id": "dPtMWpQmXvfD",
+        "commonName": "leaf",
+        "meaning": "foglia",
+        "file": "icons/ui/leaf.png",
+        "preview": "https://img.icons8.com/?id=dPtMWpQmXvfD&format=png&size=48"
+      },
+      "cloud": {
+        "id": "ER7HcTmmnbw5",
+        "commonName": "cloud",
+        "meaning": "nuvola",
+        "file": "icons/ui/cloud.png",
+        "preview": "https://img.icons8.com/?id=ER7HcTmmnbw5&format=png&size=48"
+      },
+      "phone": {
+        "id": "b9rHZPu0vmdU",
+        "commonName": "smartphone",
+        "meaning": "telefono",
+        "file": "icons/ui/phone.png",
+        "preview": "https://img.icons8.com/?id=b9rHZPu0vmdU&format=png&size=48"
+      },
+      "bell": {
+        "id": "UJnkuFxctx6X",
+        "commonName": "appointment-reminders",
+        "meaning": "campanella",
+        "file": "icons/ui/bell.png",
+        "preview": "https://img.icons8.com/?id=UJnkuFxctx6X&format=png&size=48"
+      },
+      "camera": {
+        "id": "W3Jvtr9Fewmp",
+        "commonName": "camera",
+        "meaning": "fotocamera",
+        "file": "icons/ui/camera.png",
+        "preview": "https://img.icons8.com/?id=W3Jvtr9Fewmp&format=png&size=48"
+      }
+    }
+  },
+  "tokens": {
+    "iconColor": "--fg",
+    "iconColorInactive": "--muted",
+    "accent": "--yellow",
+    "danger": "--bad",
+    "success": "--ok"
+  }
+}

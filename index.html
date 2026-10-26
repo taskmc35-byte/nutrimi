@@ -40,18 +40,18 @@
 
   <nav class="tabs" aria-label="Sezioni">
     <div class="tabs-in">
-      <button data-a="tab" data-tab="oggi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-5.5h4V20"/></svg>Oggi</button>
-      <button data-a="tab" data-tab="spesa"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.3 11.2h10.8L20.5 7H6.4"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>Spesa</button>
-      <button data-a="tab" data-tab="dispensa"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v3H8z"/><path d="M7 6h10a1 1 0 0 1 1 1v12.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19.5V7a1 1 0 0 1 1-1Z"/><path d="M6 11h12M6 16h12"/></svg>Dispensa</button>
-      <button data-a="tab" data-tab="ricette"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16v6.5A3.5 3.5 0 0 1 16.5 20h-9A3.5 3.5 0 0 1 4 16.5Z"/><path d="M2 10h20M9 6.5c0-1 1-1.2 1-2.2M13 6.5c0-1 1-1.2 1-2.2"/></svg>Ricette</button>
-      <button data-a="tab" data-tab="profilo"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.7 3.9-5.7 7.5-5.7s6.6 2 7.5 5.7"/></svg>Profilo</button>
+      <button data-a="tab" data-tab="oggi"><i class="ic" data-i="home" aria-hidden="true"></i>Oggi</button>
+      <button data-a="tab" data-tab="spesa"><i class="ic" data-i="cart" aria-hidden="true"></i>Spesa</button>
+      <button data-a="tab" data-tab="dispensa"><i class="ic" data-i="jar" aria-hidden="true"></i>Dispensa</button>
+      <button data-a="tab" data-tab="ricette"><i class="ic" data-i="pot" aria-hidden="true"></i>Ricette</button>
+      <button data-a="tab" data-tab="profilo"><i class="ic" data-i="user" aria-hidden="true"></i>Profilo</button>
     </div>
   </nav>
 
   <div id="sheet" class="sheet" hidden>
     <div class="sheet-bg" data-a="close-sheet"></div>
     <div class="sheet-panel" role="dialog" aria-modal="true">
-      <div class="sheet-grip"><span></span><button class="icon-btn sheet-x" data-a="close-sheet" aria-label="Chiudi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="sheet-grip"><span></span><button class="icon-btn sheet-x" data-a="close-sheet" aria-label="Chiudi"><i class="ic" data-i="x" aria-hidden="true"></i></button></div>
       <div id="sheet-body"></div>
     </div>
   </div>
@@ -59,7 +59,7 @@
   <div id="scanner" class="scanner" hidden>
     <div class="scan-view">
       <video id="scan-video" playsinline muted></video>
-      <div class="scan-top"><b>Scansiona il prodotto</b><button class="icon-btn" data-a="scan-close" aria-label="Chiudi scanner"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="scan-top"><b>Scansiona il prodotto</b><button class="icon-btn" data-a="scan-close" aria-label="Chiudi scanner"><i class="ic" data-i="x" aria-hidden="true"></i></button></div>
       <div class="scan-frame"><span class="scan-line"></span></div>
     </div>
     <div class="scan-bottom">
