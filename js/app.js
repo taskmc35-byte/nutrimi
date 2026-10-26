@@ -154,6 +154,7 @@
 
   /* ---------- azioni ---------- */
   var A = {};
+  N.A = A;
   A.tab = function (el) { N.go(el.dataset.tab); };
   A['close-sheet'] = function () { N.closeSheet(); };
   A['sheet-back'] = function () { N.sheetBack(); };
@@ -376,8 +377,9 @@
   };
   A['r-cook'] = function () {
     var c = N.sheetCtx, ids = N.eaters().map(function (p) { return p.id; }).slice(0, c.servings);
-    N.openSheet('cook', { id: c.id, servings: c.servings, eaters: ids }, true);
+    N.openSheet('cook', { id: c.id, servings: c.servings, eaters: ids, slot: N.slotNow() }, true);
   };
+  A['cook-slot'] = function (el) { N.sheetCtx.slot = el.dataset.slot; N.refreshSheet(); };
   A['cook-eater'] = function (el) {
     var e = N.sheetCtx.eaters, i = e.indexOf(el.dataset.id);
     if (i === -1) e.push(el.dataset.id); else e.splice(i, 1);
@@ -389,7 +391,7 @@
       if (l.have === Infinity || l.have <= 0) return;
       logs = logs.concat(N.consume(l.food.id, Math.min(l.have, l.need)));
     });
-    var meal = { id: N.uid(), date: N.today(), recipeId: r.id, title: r.t, servings: c.servings, eaters: c.eaters.slice(), per: ev.per, at: Date.now() };
+    var meal = { id: N.uid(), date: N.today(), slot: c.slot || N.slotNow(), recipeId: r.id, title: r.t, servings: c.servings, eaters: c.eaters.slice(), per: ev.per, at: Date.now() };
     if (c.eaters.length) N.put('meals', meal);
     N.closeSheet(); N.render();
     N.toast('Buon appetito! Dispensa aggiornata', function () {
@@ -536,12 +538,14 @@
     if (k === 'shop-q') { N.shopQ = e.target.value; N.renderShopSugg(); }
     else if (k === 'pantry-q') { N.pantryQ = e.target.value; var pos = e.target.selectionStart; N.render(); var x = $('#pantry-q'); x.focus(); x.setSelectionRange(pos, pos); }
     else if (k === 'pa-q') { N.sheetCtx.q = e.target.value; N.sheetCtx.foodId = null; N.renderPaResults(); }
+    else if (N.inputHandlers && N.inputHandlers[k]) N.inputHandlers[k](e);
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && e.target.id === 'shop-q') {
       e.preventDefault(); var first = document.querySelector('#shop-sugg [data-a="shop-pick"]');
       if (first) first.click(); else A['shop-free']();
     }
+    if (e.key === 'Enter' && e.target.id === 'log-q') { e.preventDefault(); N.logEnter(); }
     if (e.key === 'Escape') { if (!$('#scanner').hidden) N.closeScanner(); else if (!$('#sheet').hidden) N.closeSheet(); }
     // fuoco trattenuto nella finestra aperta (riserva per i browser senza "inert")
     if (e.key === 'Tab') {
@@ -557,6 +561,8 @@
   });
   document.addEventListener('submit', onSubmit);
   $('#scan-form').addEventListener('submit', function (e) { e.preventDefault(); N.scanner.submit($('#scan-code').value); });
+
+  Object.keys(N.extraActions || {}).forEach(function (k) { if (!A[k]) A[k] = N.extraActions[k]; });
 
   /* ---------- avvio ---------- */
   N.boot = async function () {

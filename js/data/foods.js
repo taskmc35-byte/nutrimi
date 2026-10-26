@@ -13,7 +13,12 @@
     }, o || {});
   }
   var CP = 'Cereali e pasta', CA = 'Carne e salumi', PE = 'Pesce', LU = 'Latticini e uova', LE = 'Legumi e tofu',
-      VE = 'Verdura', FR = 'Frutta', SE = 'Frutta secca e semi', CO = 'Condimenti', SP = 'Spezie ed erbe', DI = 'Dispensa';
+      VE = 'Verdura', FR = 'Frutta', SE = 'Frutta secca e semi', CO = 'Condimenti', SP = 'Spezie ed erbe', DI = 'Dispensa',
+      BA = 'Bar e fuori casa', CL = 'Colazione e snack';
+  /* voci da bar e fuori casa: valori medi stimati per 100 g, con il peso tipico di un pezzo (pz) */
+  function E(id, name, pz, kcal, p, c, s, f, sat, fib, al, o) {
+    return F(id, name, BA, kcal, p, c, s, f, sat, fib, 0, (o && o.C) || 0, 0, 0, 0, al, Object.assign({ pz: pz, est: 1 }, o || {}));
+  }
 
   window.NUTRIMI_FOODS = [
     // Cereali, pasta, pane, tuberi
@@ -161,6 +166,53 @@
     // Dispensa
     F('cacao', 'Cacao amaro', DI, 228, 20, 58, 1.8, 14, 8, 37, 0, 0, 0, 0.1, 0, '', { staple: 1, alias: ['cacao amaro in polvere', 'cacao'] }),
     F('cioccolato_fondente', 'Cioccolato fondente', DI, 550, 7.8, 46, 24, 43, 24, 11, 2, 0, 0, 0.6, 0.3, '', { alias: ['cioccolato', 'cioccolato fondente 70%'] }),
+    // Colazione e snack
+    F('granola', 'Granola', CL, 450, 10, 64, 22, 17, 3, 7, 0, 0, 0, 2, 0, 'glutine|frutta_guscio', { alias: ['muesli croccante', 'granola al miele', 'crunchy'] }),
+    F('muesli', 'Muesli', CL, 360, 10, 62, 18, 6, 1, 8, 0, 1, 0, 1, 0, 'glutine|frutta_guscio', { alias: ['muesli ai frutti'] }),
+    F('cornflakes', 'Corn flakes', CL, 378, 7, 84, 8, 0.9, 0.2, 3, 0, 0, 2, 0.1, 0.8, 'glutine', { alias: ['cereali', 'cereali da colazione', 'fiocchi di mais'] }),
+    F('fette_biscottate', 'Fette biscottate', CL, 410, 11, 73, 7, 7, 1, 3.5, 0, 0, 0, 0.5, 0, 'glutine', { pz: 8, alias: ['fetta biscottata', 'fette biscottate integrali'] }),
+    F('biscotti', 'Biscotti secchi', CL, 440, 7, 72, 22, 13, 6, 2.5, 0, 0, 0, 1, 0, 'glutine|latte|uova', { pz: 8, lat: 1, alias: ['biscotto', 'biscotti frollini', 'frollini', 'biscotti integrali'] }),
+    F('cracker', 'Cracker', CL, 430, 10, 70, 2, 11, 2, 3.5, 0, 0, 0, 1, 0, 'glutine', { pz: 7, alias: ['crackers', 'gallette', 'grissini', 'taralli'] }),
+    F('marmellata', 'Marmellata', CL, 250, 0.4, 60, 50, 0.1, 0, 1, 0, 5, 0, 0, 0, '', { alias: ['confettura', 'marmellata di albicocche', 'confettura extra'] }),
+    F('crema_spalmabile', 'Crema spalmabile al cacao', CL, 540, 6, 57, 56, 31, 10, 3.5, 0, 0, 0, 5, 0, 'latte|frutta_guscio|soia', { lat: 1, alias: ['nutella', 'crema alle nocciole', 'crema di nocciole'] }),
+    F('frutta_secca_mista', 'Frutta secca mista', SE, 600, 18, 15, 5, 52, 6, 8, 0, 1, 0, 10, 0, 'frutta_guscio|arachidi', { alias: ['mix di frutta secca', 'frutta secca', 'snack di frutta secca'] }),
+    F('nocciole', 'Nocciole', SE, 628, 15, 17, 4, 61, 4.5, 9.7, 1, 6, 0, 15, 0, 'frutta_guscio', { alias: ['nocciola', 'nocciole tostate'] }),
+    F('latte_soia', 'Bevanda di soia', LU, 33, 3, 0.7, 0.5, 1.8, 0.3, 0.5, 0, 0, 0.8, 0.2, 0.4, 'soia', { alias: ['latte di soia'] }),
+    F('bevanda_avena', "Bevanda d'avena", LU, 45, 1, 6.5, 3.5, 1.5, 0.2, 0.8, 0, 0, 0.8, 0.1, 0.4, 'glutine', { alias: ["latte d'avena", 'latte di avena', 'bevanda di avena'] }),
+
+    // Bar e fuori casa (valori stimati)
+    E('caffe', 'Caffè espresso', 30, 2, 0.1, 0.3, 0, 0.2, 0.1, 0, '', { alias: ['caffe', 'espresso', 'caffè', 'caffè ristretto', 'caffè lungo', 'caffè americano', 'caffè decaffeinato', 'deca', 'orzo'] }),
+    E('zucchero_bustina', 'Bustina di zucchero', 5, 400, 0, 100, 100, 0, 0, 0, '', { alias: ['zucchero nel caffè', 'bustina'] }),
+    E('caffe_macchiato', 'Caffè macchiato', 45, 22, 1.2, 1.7, 1.7, 1.1, 0.7, 0, 'latte', { lat: 1, alias: ['macchiato'] }),
+    E('cappuccino', 'Cappuccino', 160, 40, 2.2, 3.3, 3.3, 1.9, 1.2, 0, 'latte', { lat: 1, alias: ['cappuccio'] }),
+    E('latte_macchiato', 'Latte macchiato', 220, 45, 3.2, 4.6, 4.6, 1.5, 1, 0, 'latte', { lat: 1, alias: ['caffellatte', 'caffè latte'] }),
+    E('cioccolata_calda', 'Cioccolata calda', 200, 100, 3.5, 15, 12, 3, 2, 1, 'latte', { lat: 1 }),
+    E('te', 'Tè', 250, 1, 0, 0.2, 0, 0, 0, 0, '', { alias: ['te', 'tè caldo', 'tisana', 'infuso'] }),
+    E('cornetto_vuoto', 'Cornetto vuoto', 50, 410, 7.5, 45, 12, 22, 13, 2, 'glutine|uova|latte', { lat: 1, alias: ['cornetto semplice', 'croissant', 'brioche vuota', 'brioche semplice'] }),
+    E('cornetto_marmellata', 'Cornetto alla marmellata', 70, 370, 6, 50, 20, 16, 9, 2, 'glutine|uova|latte', { lat: 1, alias: ['brioche alla marmellata', 'croissant alla marmellata', 'cornetto albicocca'] }),
+    E('cornetto_crema', 'Cornetto alla crema', 75, 380, 7, 46, 18, 19, 10, 1.5, 'glutine|uova|latte', { lat: 1, alias: ['brioche alla crema', 'croissant alla crema'] }),
+    E('cornetto_cioccolato', 'Cornetto al cioccolato', 75, 420, 7, 47, 20, 22, 12, 2.5, 'glutine|uova|latte', { lat: 1, alias: ['brioche al cioccolato', 'croissant al cioccolato', 'cornetto alla nutella'] }),
+    E('cornetto_integrale', 'Cornetto integrale al miele', 70, 360, 7, 48, 15, 15, 8, 5, 'glutine|uova|latte', { lat: 1, alias: ['brioche integrale', 'cornetto ai cereali'] }),
+    E('bombolone', 'Bombolone alla crema', 80, 360, 6, 45, 18, 18, 8, 1.5, 'glutine|uova|latte', { lat: 1, alias: ['krapfen', 'bomba alla crema', 'ciambella fritta'] }),
+    E('pasticcino', 'Pasticcino', 35, 380, 5, 45, 28, 20, 11, 1, 'glutine|uova|latte', { lat: 1, alias: ['pasticcini', 'mignon', 'pasta alla crema', 'bignè'] }),
+    E('spremuta', "Spremuta d'arancia", 200, 40, 0.6, 9, 8, 0.1, 0, 0.3, '', { C: 45, alias: ['spremuta', 'spremuta di arance'] }),
+    E('succo_frutta', 'Succo di frutta', 200, 50, 0.3, 12, 11, 0.1, 0, 0.3, '', { alias: ['succo', 'succo di pesca', 'succo ace', 'succo alla pera', 'estathè', 'tè freddo'] }),
+    E('bibita', 'Bibita gassata', 330, 42, 0, 10.6, 10.6, 0, 0, 0, '', { alias: ['coca cola', 'aranciata', 'lattina', 'bibita', 'gazzosa', 'chinotto'] }),
+    E('birra', 'Birra media', 400, 43, 0.5, 3.5, 0.2, 0, 0, 0, 'glutine', { alias: ['birra', 'birra piccola', 'pinta'] }),
+    E('vino', 'Calice di vino', 125, 85, 0.1, 2.6, 0.6, 0, 0, 0, 'solfiti', { alias: ['vino rosso', 'vino bianco al calice', 'prosecco', 'bicchiere di vino'] }),
+    E('spritz', 'Spritz', 200, 75, 0, 8, 8, 0, 0, 0, 'solfiti', { alias: ['aperitivo', 'aperol spritz', 'campari spritz'] }),
+    E('toast', 'Toast prosciutto e formaggio', 120, 270, 13, 28, 3, 11, 5, 1.5, 'glutine|latte', { lat: 1, alias: ['toast', 'toast farcito'] }),
+    E('tramezzino', 'Tramezzino', 120, 250, 9, 22, 2.5, 14, 2.5, 1.2, 'glutine|uova|pesce', { alias: ['tramezzino tonno', 'tramezzino tonno e uova', 'tramezzino prosciutto'] }),
+    E('panino_crudo', 'Panino al prosciutto crudo', 150, 280, 13, 38, 2, 8, 3, 2, 'glutine', { alias: ['panino', 'panino imbottito', 'panino salame', 'panino con affettato'] }),
+    E('piadina', 'Piadina prosciutto e formaggio', 220, 300, 13, 33, 2, 13, 6, 1.5, 'glutine|latte', { lat: 1, alias: ['piadina', 'piadina farcita', 'piadina crudo squacquerone'] }),
+    E('pizza_trancio', 'Trancio di pizza margherita', 150, 270, 10, 35, 3, 9, 4, 2, 'glutine|latte', { lat: 1, alias: ['pizza al taglio', 'trancio di pizza', 'pizzetta'] }),
+    E('pizza_intera', 'Pizza margherita intera', 330, 240, 10, 32, 3, 8, 3.5, 2, 'glutine|latte', { lat: 1, alias: ['pizza', 'pizza in pizzeria', 'margherita'] }),
+    E('focaccia', 'Focaccia', 100, 300, 7, 42, 2, 11, 1.6, 2, 'glutine', { alias: ['focaccia genovese', 'schiacciata'] }),
+    E('hamburger', 'Panino hamburger', 220, 250, 13, 26, 5, 10, 4, 1.5, 'glutine|latte|sesamo', { lat: 1, alias: ['hamburger', 'cheeseburger', 'burger'] }),
+    E('patatine_fritte', 'Patatine fritte (porzione)', 150, 310, 3.4, 41, 0.3, 15, 2.3, 3.8, '', { alias: ['patatine fritte', 'patate fritte', 'chips'] }),
+    E('insalatona', 'Insalatona', 350, 90, 5, 4, 2, 6, 1.5, 2, 'uova', { alias: ['insalata mista al bar', 'insalata con tonno', 'caesar salad'] }),
+    E('gelato', 'Gelato (coppetta)', 100, 210, 4, 25, 21, 10, 6, 0.5, 'latte', { lat: 1, alias: ['gelato', 'cono gelato', 'coppetta'] }),
+
     F('lievito', 'Lievito', DI, 100, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', { staple: 1, alias: ['lievito per dolci', 'lievito di birra', 'lievito istantaneo', 'bicarbonato'] })
   ];
 })();

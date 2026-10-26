@@ -90,7 +90,8 @@
       '<section class="hello"><p class="eyebrow">' + longDate() + '</p><h1>Ciao ' + esc(me.name) + '</h1></section>' +
       '<section class="card today"><div class="today-ring">' + ring(eaten.kcal, t.kcal) + '</div><div class="today-bars">' +
       bar('Proteine', eaten.p, t.p, 'p') + bar('Carboidrati', eaten.c, t.c, 'c') + bar('Grassi', eaten.f, t.f, 'f') +
-      '<p class="today-note">' + goalLabel(me.goal) + ' · ' + (left > 0 ? 'ti restano <b>' + N.f0(left) + ' kcal</b>' : 'obiettivo calorico raggiunto') + '</p></div></section>';
+      '<p class="today-note">' + goalLabel(me.goal) + ' · ' + (left > 0 ? 'ti restano <b>' + N.f0(left) + ' kcal</b>' : 'obiettivo calorico raggiunto') + '</p></div>' +
+      '<button class="btn primary block today-add" data-a="log-open">' + N.IC.plus + 'Aggiungi al diario</button></section>';
 
     var pst = N.push.status();
     if (pst === 'off' && !N.push.disabledByUser()) h += '<div class="card notify-cta"><span class="nd-ic">' + N.IC.bell + '</span><div class="nc-txt"><b>Attiva gli avvisi di scadenza</b><p class="muted small">Ti avvisiamo alle 9:00, 3 giorni prima.</p></div><button class="btn small primary" data-a="push-on">Attiva</button></div>';
@@ -115,12 +116,7 @@
     else h += '<div class="hscroll">' + ranked.map(function (e) { return recipeTile(e); }).join('') + '</div>';
     h += '</section>';
 
-    if (meals.length) {
-      h += '<section><div class="sec-head"><h2>Oggi hai mangiato</h2></div><ul class="list">' + meals.map(function (m) {
-        return '<li class="row"><div class="row-main"><div class="name">' + esc(m.title) + '</div><div class="meta num">' + N.f0(m.per.kcal) + ' kcal · ' + macroMini(m.per) + '</div></div>' +
-          '<button class="icon-btn" data-a="meal-del" data-id="' + m.id + '" aria-label="Elimina dal diario">' + N.IC.trash + '</button></li>';
-      }).join('') + '</ul></section>';
-    }
+    h += N.diaryHtml(me);
 
     h += '<section><div class="sec-head"><h2>In esaurimento</h2><button class="link" data-a="tab" data-tab="dispensa">Dispensa</button></div>';
     if (!low.length) h += '<p class="muted small">Nessun prodotto sotto il 25% della quantità acquistata.</p>';
@@ -180,7 +176,7 @@
   }
   function shopSugg() {
     var q = N.shopQ || ''; if (!q.trim()) return '';
-    var people = N.S.profiles, res = N.searchFoods(q, 6);
+    var people = N.S.profiles, res = N.searchFoods(q, 6, { noEst: true });
     var h = '<ul class="sugg">' + res.map(function (f) {
       var conf = N.conflicts({ foodId: f.id, name: f.name }, people);
       return '<li><button data-a="shop-pick" data-food="' + f.id + '"><span class="name">' + esc(f.name) + '</span><span class="meta">' + esc(f.cat) + ' · ' + N.f0(f.n.kcal) + ' kcal/100 g</span>' + conflictBadges(conf) + '</button></li>';
@@ -227,7 +223,7 @@
   };
 
   /* ====================================================== RICETTE */
-  var FILTERS = [['tutte', 'Tutte'], ['scadenza', 'Da consumare'], ['pronte', 'Pronte ora'], ['quasi', 'Ti manca poco'], ['colazione', 'Colazione'], ['primo', 'Primi'], ['secondo', 'Secondi'], ['unico', 'Piatti unici'], ['web', 'Dal web']];
+  var FILTERS = [['tutte', 'Tutte'], ['scadenza', 'Da consumare'], ['pronte', 'Pronte ora'], ['quasi', 'Ti manca poco'], ['colazione', 'Colazione'], ['primo', 'Primi'], ['secondo', 'Secondi'], ['mie', 'Mie ricette'], ['unico', 'Piatti unici'], ['web', 'Dal web']];
   N.views.ricette = function () {
     var S = N.S.settings, me = N.me(), people = N.S.profiles, eaters = N.eaters();
     var all = N.rankRecipes(S.servings), f = S.filter || 'tutte';
@@ -238,10 +234,12 @@
       if (f === 'scadenza') return e.soonLines.length > 0;
       if (f === 'quasi') return !e.ready && e.missing + e.partial <= 2;
       if (f === 'web') return !!e.r.imported;
+      if (f === 'mie') return !!e.r.custom;
       if (f !== 'tutte') return (e.r.tag || []).indexOf(f) !== -1;
       return true;
     });
-    var h = demoBanner() + '<div class="view-head"><h1>Ricette</h1><p class="muted num">' + all.filter(function (e) { return e.ready && !e.blocked; }).length + ' pronte con quello che hai</p></div>';
+    var h = demoBanner() + '<div class="view-head row-head"><div><h1>Ricette</h1><p class="muted num">' + all.filter(function (e) { return e.ready && !e.blocked; }).length + ' pronte con quello che hai</p></div>' +
+      '<button class="btn small primary" data-a="recipe-new">' + N.IC.plus + 'Nuova ricetta</button></div>';
     h += '<div class="card controls"><div class="ctl"><span class="ctl-l">Porzioni</span>' + stepper(S.servings, 'servings', 1, 6) + '</div>' +
       '<div class="ctl col"><span class="ctl-l">A tavola</span><div class="chips">' + people.map(function (p) {
         return chip(p.name, eaters.some(function (x) { return x.id === p.id; }), 'data-a="eater" data-id="' + p.id + '"');
@@ -445,7 +443,8 @@
     var sv = ctx.servings, ev = N.evaluate(r, sv), people = N.eaters(), conf = N.recipeConflicts(ev, people), me = N.me();
     var showTot = ctx.view === 'tot', n = showTot ? ev.tot : ev.per;
     var h = '<div class="sh-head"><p class="eyebrow">' + (r.tag || []).map(function (t) { return { colazione: 'Colazione', primo: 'Primo', secondo: 'Secondo', unico: 'Piatto unico', vegetariana: 'Vegetariana', vegana: 'Vegana' }[t] || t; }).join(' · ') + '</p>' +
-      '<h2>' + esc(r.t) + '</h2><p class="muted small">' + N.IC.clock + ' ' + r.min + ' minuti · ' + (r.imported ? 'Fonte: ' + esc(r.src) : 'Ricetta Nutrimi') + '</p></div>';
+      '<h2>' + esc(r.t) + '</h2><p class="muted small">' + N.IC.clock + ' ' + r.min + ' minuti · ' + (r.imported ? 'Fonte: ' + esc(r.src) : r.custom ? esc(r.src) : 'Ricetta Nutrimi') + '</p></div>';
+    if (N.canEditRecipe && N.canEditRecipe(r)) h += '<div class="row-actions"><button class="btn ghost" data-a="recipe-edit" data-id="' + r.id + '">Modifica ricetta</button></div>';
     h += '<div class="ctl"><span class="ctl-l">Porzioni</span>' + stepper(sv, 'r-serv', 1, 6) + '</div>';
     if (conf.length) h += conflictBadges(conf);
     if (me && N.targets(me)) {
@@ -485,6 +484,7 @@
       else txt = '−' + N.qty(Math.min(l.have, l.need), l.food.id);
       return '<li class="' + (txt === 'non in dispensa' ? 'missing' : 'ok') + '"><span class="ing-n">' + esc(l.food.name) + '</span><span class="ing-q num">' + txt + '</span></li>';
     }).join('') + '</ul>';
+    h += '<div class="field"><span>Nel diario come</span>' + N.ui.slotChips(ctx.slot, 'cook-slot') + '</div>';
     h += '<div class="field"><span>Chi ha mangiato (una porzione a testa nel diario)</span><div class="chips">' + N.S.profiles.map(function (p) {
       return chip(p.name, eat.indexOf(p.id) !== -1, 'data-a="cook-eater" data-id="' + p.id + '"');
     }).join('') + '</div></div>';
@@ -539,7 +539,7 @@
 
   /* aggiungi in dispensa */
   N.sheets.pantryAdd = function (ctx) {
-    var q = ctx.q || '', res = N.searchFoods(q, 8);
+    var q = ctx.q || '', res = N.searchFoods(q, 8, { noEst: true });
     var h = '<div class="sh-head"><p class="eyebrow">Dispensa</p><h2>Aggiungi un prodotto</h2></div>' +
       '<div class="adder"><label class="search">' + N.IC.search + '<input id="pa-q" data-in="pa-q" autocomplete="off" placeholder="Cerca un alimento" value="' + esc(q) + '"></label>' +
       '<button class="icon-btn solid" data-a="scan" data-for="pantry" aria-label="Scansiona">' + N.IC.scan + '</button></div><div id="pa-res">' + paResults(res, ctx) + '</div>' +
@@ -560,7 +560,7 @@
     if (!(ctx.q || '').trim()) return '<p class="muted small">Scrivi il nome di un alimento, scansiona il codice a barre o inserisci i valori a mano.</p>';
     return '<ul class="sugg">' + res.map(function (f) { return '<li><button data-a="pa-pick" data-food="' + f.id + '"><span class="name">' + esc(f.name) + '</span><span class="meta">' + esc(f.cat) + '</span></button></li>'; }).join('') + '</ul>';
   }
-  N.renderPaResults = function () { var el = document.getElementById('pa-res'); if (el) el.innerHTML = paResults(N.searchFoods(N.sheetCtx.q || '', 8), N.sheetCtx); };
+  N.renderPaResults = function () { var el = document.getElementById('pa-res'); if (el) el.innerHTML = paResults(N.searchFoods(N.sheetCtx.q || '', 8, { noEst: true }), N.sheetCtx); };
 
   /* prodotto manuale */
   N.sheets.manual = function (ctx) {

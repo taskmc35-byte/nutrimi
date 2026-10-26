@@ -7,6 +7,8 @@ Web app installabile per la spesa, la dispensa e le ricette mediterranee, calibr
 - **Ricette**: 30 ricette mediterranee incluse + quelle importate ogni settimana. Da 1 a 6 porzioni, ordinate per quello che hai e per il tuo obiettivo.
 - **Ho cucinato**: scala dalla dispensa le quantità usate e registra il pasto nel diario di chi ha mangiato.
 - **Valori nutrizionali**: kcal, proteine, carboidrati (zuccheri), grassi insaturi e saturi, fibre, vitamine A, C, D, E, B12 per prodotti e ricette.
+- **Diario**: "Aggiungi al diario" registra qualsiasi pasto (colazione, pranzo, spuntino, cena), anche al bar o fuori casa con valori stimati, e aggiorna il fabbisogno del giorno; ciò che viene da casa si toglie dalla dispensa.
+- **Le mie ricette**: ogni persona può creare ricette proprie, visibili a tutta la casa; solo chi le ha create può modificarle.
 - **Scadenze**: data inserita a mano o letta dalla foto dell'etichetta. Tre giorni prima arriva una notifica con le ricette che usano il prodotto; da scaduto è segnato in rosso, non conta più come disponibile e le ricette lo segnalano.
 - **Profilo**: nome, sesso, età, peso, altezza, allergie, intolleranze, obiettivo (dimagrire, mantenere, massa o valori personalizzati).
 

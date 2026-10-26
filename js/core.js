@@ -25,17 +25,21 @@
   N.FOODS = window.NUTRIMI_FOODS || [];
   N.FOOD = {};
   N.FOODS.forEach(function (f) { N.FOOD[f.id] = f; f._keys = [N.norm(f.name)].concat((f.alias || []).map(N.norm)); });
-  N.CATS = ['Cereali e pasta', 'Carne e salumi', 'Pesce', 'Latticini e uova', 'Legumi e tofu', 'Verdura', 'Frutta', 'Frutta secca e semi', 'Condimenti', 'Spezie ed erbe', 'Dispensa', 'Altro'];
+  N.CATS = ['Cereali e pasta', 'Carne e salumi', 'Pesce', 'Latticini e uova', 'Legumi e tofu', 'Verdura', 'Frutta', 'Frutta secca e semi', 'Condimenti', 'Spezie ed erbe', 'Dispensa', 'Colazione e snack', 'Bar e fuori casa', 'Altro'];
 
-  N.searchFoods = function (q, limit) {
+  N.searchFoods = function (q, limit, opts) {
     q = N.norm(q); if (!q) return [];
-    var out = [];
+    var out = [], noEst = opts && opts.noEst;
+    var words = q.split(' ').filter(function (w) { return w.length > 1 && ['al', 'alla', 'allo', 'di', 'del', 'della', 'con', 'e'].indexOf(w) === -1; });
     N.FOODS.forEach(function (f) {
+      if (noEst && f.est) return;
       var best = 99;
       f._keys.forEach(function (k, i) {
         var pos = k.indexOf(q);
         if (pos === 0) best = Math.min(best, i === 0 ? 0 : 1);
         else if (pos > 0) best = Math.min(best, i === 0 ? 2 : 3);
+        // ogni parola cercata compare nel nome, in qualsiasi ordine ("cornetto marm")
+        else if (words.length > 1 && words.every(function (w) { return k.indexOf(w) !== -1; })) best = Math.min(best, i === 0 ? 4 : 5);
       });
       if (best < 99) out.push([best, f]);
     });
