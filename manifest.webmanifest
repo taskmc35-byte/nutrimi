@@ -9,27 +9,119 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#060A12",
+  "background_color": "#0D1A36",
   "theme_color": "#060A12",
-  "categories": ["food", "health", "lifestyle"],
+  "categories": [
+    "food",
+    "health",
+    "lifestyle"
+  ],
   "prefer_related_applications": false,
-  "launch_handler": { "client_mode": "focus-existing" },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ],
   "shortcuts": [
-    { "name": "Lista della spesa", "short_name": "Spesa", "url": "/?tab=spesa", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Dispensa", "short_name": "Dispensa", "url": "/?tab=dispensa", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Ricette", "short_name": "Ricette", "url": "/?tab=ricette", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+    {
+      "name": "Lista della spesa",
+      "short_name": "Spesa",
+      "url": "/?tab=spesa",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dispensa",
+      "short_name": "Dispensa",
+      "url": "/?tab=dispensa",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ricette",
+      "short_name": "Ricette",
+      "url": "/?tab=ricette",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ],
   "screenshots": [
-    { "src": "screenshots/1-oggi.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Calorie e macro del giorno, prodotti da consumare presto" },
-    { "src": "screenshots/2-spesa.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Lista della spesa con controllo allergeni" },
-    { "src": "screenshots/3-ricette.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Ricette in base a dispensa e obiettivo" },
-    { "src": "screenshots/4-ricetta.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Ingredienti, porzioni e valori nutrizionali" },
-    { "src": "screenshots/5-dispensa.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Dispensa con scadenze" }
+    {
+      "src": "screenshots/1-oggi.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Calorie e macro del giorno, prodotti da consumare presto"
+    },
+    {
+      "src": "screenshots/2-spesa.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Lista della spesa con controllo allergeni"
+    },
+    {
+      "src": "screenshots/3-ricette.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ricette in base a dispensa e obiettivo"
+    },
+    {
+      "src": "screenshots/4-ricetta.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ingredienti, porzioni e valori nutrizionali"
+    },
+    {
+      "src": "screenshots/5-dispensa.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dispensa con scadenze"
+    }
   ]
 }

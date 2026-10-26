@@ -100,7 +100,7 @@
   };
 
   async function show(title, body) {
-    var opts = { body: body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'nutrimi-scadenze', data: { url: './' } };
+    var opts = { body: body, icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'nutrimi-scadenze', data: { url: './' } };
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       var reg = await navigator.serviceWorker.ready; return reg.showNotification(title, opts);
     }
