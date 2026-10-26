@@ -21,30 +21,93 @@
 </head>
 <body>
   <div id="intro" class="intro" aria-hidden="true">
-    <div class="intro-in">
-      <svg class="intro-mark" viewBox="0 0 1024 1024" width="168" height="168">
-        <g class="intro-stems">
-          <rect x="300" y="290" width="104" height="444" rx="52" fill="#EAF0FA"/>
-          <rect x="620" y="290" width="104" height="444" rx="52" fill="#EAF0FA"/>
-        </g>
-        <g class="intro-leaf">
-          <g transform="translate(512 512) rotate(44.55)">
-            <path d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z" fill="#FFC83D" stroke="#0B1630" stroke-width="24" stroke-linejoin="round" paint-order="stroke"/>
-            <path d="M-148.2 0 Q 0 -8 152.7 0" fill="none" stroke="#0A1427" stroke-width="14" stroke-linecap="round"/>
+    <canvas id="intro-fx"></canvas>
+    <div class="intro-stage">
+      <div class="intro-markwrap" id="intro-markwrap">
+        <svg class="intro-mark" viewBox="0 0 1024 1024" width="210" height="210">
+          <defs>
+            <linearGradient id="iStem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D5E0F5"/></linearGradient>
+            <linearGradient id="iLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE7A3"/><stop offset=".45" stop-color="#FFC83D"/><stop offset="1" stop-color="#E39E00"/></linearGradient>
+            <linearGradient id="iGlint" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+            <clipPath id="iLeafClip"><path transform="translate(512 512) rotate(44.55)" d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z"/></clipPath>
+            <filter id="iGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="26"/></filter>
+          </defs>
+          <g class="i-halo" filter="url(#iGlow)">
+            <rect x="300" y="290" width="104" height="444" rx="52" fill="#7FA6FF"/>
+            <rect x="620" y="290" width="104" height="444" rx="52" fill="#7FA6FF"/>
+            <path transform="translate(512 512) rotate(44.55)" d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z" fill="#FFC83D"/>
           </g>
-        </g>
-      </svg>
-      <span class="intro-word">Nutrimi</span>
+          <g class="i-stems">
+            <rect class="i-fill" x="300" y="290" width="104" height="444" rx="52" fill="url(#iStem)"/>
+            <rect class="i-fill" x="620" y="290" width="104" height="444" rx="52" fill="url(#iStem)"/>
+            <rect class="i-trace" x="300" y="290" width="104" height="444" rx="52" pathLength="1"/>
+            <rect class="i-trace" x="620" y="290" width="104" height="444" rx="52" pathLength="1"/>
+          </g>
+          <g class="i-leaf">
+            <g transform="translate(512 512) rotate(44.55)">
+              <path class="i-leaf-gap" d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z"/>
+              <path class="i-leaf-fill" d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z" fill="url(#iLeaf)"/>
+              <path class="i-trace i-leaf-trace" pathLength="1" d="M-224.5 0 C -94.3 -85.0, 94.3 -85.0, 224.5 0 C 94.3 85.0, -94.3 85.0, -224.5 0 Z"/>
+              <path class="i-vein" pathLength="1" d="M-148.2 0 Q 0 -8 152.7 0"/>
+            </g>
+            <g clip-path="url(#iLeafClip)"><rect class="i-glint" x="160" y="120" width="150" height="800" fill="url(#iGlint)" transform="rotate(20 512 512)"/></g>
+          </g>
+        </svg>
+      </div>
+      <div class="intro-word" id="intro-word"><span>N</span><span>u</span><span>t</span><span>r</span><span>i</span><span>m</span><span>i</span></div>
+      <i class="intro-line"></i>
     </div>
   </div>
   <script>
     (function () {
       var el = document.getElementById('intro'); if (!el) return;
       var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) el.classList.add('static');
+      /* pulviscolo dorato e scintille */
+      var cv = document.getElementById('intro-fx'), ctx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), W, H, dust = [], sparks = [], t0 = performance.now(), raf;
+      function size() { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+      size(); addEventListener('resize', size);
+      for (var i = 0; i < 70; i++) dust.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.8 + 0.4, z: Math.random(), vy: Math.random() * 0.25 + 0.05, ph: Math.random() * 6.28 });
+      function burst() {
+        var cx = W / 2 + 6, cy = H / 2 - 40;
+        for (var k = 0; k < 34; k++) { var a = Math.random() * 6.28, sp = Math.random() * 3.2 + 1; sparks.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.6, life: 1, r: Math.random() * 2 + 0.8 }); }
+      }
+      var burstDone = false;
+      function frame(now) {
+        var t = (now - t0) / 1000; ctx.clearRect(0, 0, W, H);
+        var fade = Math.min(1, t / 0.6);
+        dust.forEach(function (d) {
+          d.y -= d.vy * (0.6 + d.z); d.x += Math.sin(t * 0.8 + d.ph) * 0.15; if (d.y < -5) { d.y = H + 5; d.x = Math.random() * W; }
+          var a = (0.25 + 0.55 * d.z) * (0.6 + 0.4 * Math.sin(t * 2 + d.ph)) * fade;
+          ctx.beginPath(); ctx.arc(d.x, d.y, d.r * (0.6 + d.z), 0, 6.28); ctx.fillStyle = 'rgba(255,214,120,' + a.toFixed(3) + ')'; ctx.fill();
+        });
+        if (!burstDone && t > 1.55 && !reduce) { burstDone = true; burst(); }
+        sparks = sparks.filter(function (s) { return s.life > 0; });
+        sparks.forEach(function (s) {
+          s.x += s.vx; s.y += s.vy; s.vx *= 0.96; s.vy = s.vy * 0.96 + 0.03; s.life -= 0.018;
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r * s.life + 0.3, 0, 6.28); ctx.fillStyle = 'rgba(255,224,150,' + Math.max(0, s.life).toFixed(3) + ')'; ctx.fill();
+        });
+        raf = requestAnimationFrame(frame);
+      }
+      if (!reduce) raf = requestAnimationFrame(frame);
+      /* alla fine il logo vola al suo posto nell'app */
       var done = false;
-      function hide() { if (done) return; done = true; el.classList.add('out'); setTimeout(function () { el.remove(); }, 320); }
-      el.addEventListener('click', hide);
-      setTimeout(hide, reduce ? 700 : 1900);
+      function finish() {
+        if (done) return; done = true;
+        var wrap = document.getElementById('intro-markwrap');
+        var target = [].slice.call(document.querySelectorAll('.top .logo-mark, .brand-big .logo-mark')).find(function (n) { var r = n.getBoundingClientRect(); return r.width > 0 && r.top >= 0 && r.top < innerHeight; });
+        if (target && wrap && !reduce) {
+          var tr = target.getBoundingClientRect(), svg = wrap.querySelector('svg').getBoundingClientRect();
+          var markW = svg.width * 472 / 1024, markCx = svg.left + svg.width / 2, markCy = svg.top + svg.height * (512 / 1024);
+          var sc = tr.width / markW;
+          wrap.style.transform = 'translate(' + (tr.left + tr.width / 2 - markCx) + 'px,' + (tr.top + tr.height / 2 - markCy) + 'px) scale(' + sc + ')';
+          el.classList.add('fly');
+          setTimeout(function () { el.classList.add('out'); }, 600);
+        } else el.classList.add('out');
+        setTimeout(function () { cancelAnimationFrame(raf); el.remove(); }, 1050);
+      }
+      el.addEventListener('click', finish);
+      setTimeout(finish, reduce ? 700 : 2700);
     })();
   </script>
   <div class="app">
