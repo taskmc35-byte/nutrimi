@@ -162,6 +162,97 @@
         "meaning": "fotocamera",
         "file": "icons/ui/camera.png",
         "preview": "https://img.icons8.com/?id=W3Jvtr9Fewmp&format=png&size=48"
+      },
+      "star": {
+        "id": "WJRf67QgKO2k",
+        "commonName": "star",
+        "meaning": "punti",
+        "file": "icons/ui/star.png",
+        "preview": "https://img.icons8.com/?id=WJRf67QgKO2k&format=png&size=48"
+      },
+      "gift": {
+        "id": "IE7sPRCpVPEq",
+        "commonName": "gift",
+        "meaning": "premi",
+        "file": "icons/ui/gift.png",
+        "preview": "https://img.icons8.com/?id=IE7sPRCpVPEq&format=png&size=48"
+      },
+      "shop": {
+        "id": "rkVMQqdC1O9B",
+        "commonName": "shop",
+        "meaning": "negozio",
+        "file": "icons/ui/shop.png",
+        "preview": "https://img.icons8.com/?id=rkVMQqdC1O9B&format=png&size=48"
+      },
+      "palette": {
+        "id": "nddG5SVBXaPu",
+        "commonName": "color-palette",
+        "meaning": "temi colore",
+        "file": "icons/ui/palette.png",
+        "preview": "https://img.icons8.com/?id=nddG5SVBXaPu&format=png&size=48"
+      },
+      "frame": {
+        "id": "786rqd0QZvGc",
+        "commonName": "frame",
+        "meaning": "cornici",
+        "file": "icons/ui/frame.png",
+        "preview": "https://img.icons8.com/?id=786rqd0QZvGc&format=png&size=48"
+      },
+      "fire": {
+        "id": "YnENNNOkMYYr",
+        "commonName": "fire-element",
+        "meaning": "serie di giorni",
+        "file": "icons/ui/fire.png",
+        "preview": "https://img.icons8.com/?id=YnENNNOkMYYr&format=png&size=48"
+      },
+      "trophy": {
+        "id": "xjrQGcWGaaai",
+        "commonName": "trophy",
+        "meaning": "sfida settimanale",
+        "file": "icons/ui/trophy.png",
+        "preview": "https://img.icons8.com/?id=xjrQGcWGaaai&format=png&size=48"
+      },
+      "shirt": {
+        "id": "qyfPEE9msgYq",
+        "commonName": "t-shirt",
+        "meaning": "vestiti",
+        "file": "icons/ui/shirt.png",
+        "preview": "https://img.icons8.com/?id=qyfPEE9msgYq&format=png&size=48"
+      },
+      "glasses": {
+        "id": "SbGF6TtVJTh4",
+        "commonName": "glasses",
+        "meaning": "accessori",
+        "file": "icons/ui/glasses.png",
+        "preview": "https://img.icons8.com/?id=SbGF6TtVJTh4&format=png&size=48"
+      },
+      "sparkles": {
+        "id": "GLQpuNpbw1T4",
+        "commonName": "sparkles",
+        "meaning": "nuovo / sbloccato",
+        "file": "icons/ui/sparkles.png",
+        "preview": "https://img.icons8.com/?id=GLQpuNpbw1T4&format=png&size=48"
+      },
+      "lock": {
+        "id": "wOIqJRXQc1Jn",
+        "commonName": "lock",
+        "meaning": "bloccato",
+        "file": "icons/ui/lock.png",
+        "preview": "https://img.icons8.com/?id=wOIqJRXQc1Jn&format=png&size=48"
+      },
+      "smile": {
+        "id": "SAx0KRzuJhWQ",
+        "commonName": "smiling",
+        "meaning": "viso",
+        "file": "icons/ui/smile.png",
+        "preview": "https://img.icons8.com/?id=SAx0KRzuJhWQ&format=png&size=48"
+      },
+      "hair": {
+        "id": "Ymi2YvcjrWjM",
+        "commonName": "womans-hair",
+        "meaning": "capelli",
+        "file": "icons/ui/hair.png",
+        "preview": "https://img.icons8.com/?id=Ymi2YvcjrWjM&format=png&size=48"
       }
     }
   },

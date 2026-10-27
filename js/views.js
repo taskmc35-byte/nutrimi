@@ -8,7 +8,8 @@
   function ic(name) { return '<i class="ic" data-i="' + name + '" aria-hidden="true"></i>'; }
   N.IC = {};
   ['home', 'cart', 'jar', 'pot', 'user', 'scan', 'plus', 'minus', 'check', 'x', 'trash', 'search', 'alert',
-    'clock', 'link', 'chev', 'leaf', 'cloud', 'phone', 'bell', 'camera'].forEach(function (k) { N.IC[k] = ic(k); });
+    'clock', 'link', 'chev', 'leaf', 'cloud', 'phone', 'bell', 'camera',
+    'star', 'gift', 'shop', 'palette', 'frame', 'fire', 'trophy', 'shirt', 'glasses', 'sparkles', 'lock', 'smile', 'hair'].forEach(function (k) { N.IC[k] = ic(k); });
 
   var MONTHS = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
   var DAYS = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
@@ -88,6 +89,7 @@
 
     var h = demoBanner() +
       '<section class="hello"><p class="eyebrow">' + longDate() + '</p><h1>Ciao ' + esc(me.name) + '</h1></section>' +
+      (N.rewardStrip ? N.rewardStrip() : '') +
       '<section class="card today"><div class="today-ring">' + ring(eaten.kcal, t.kcal) + '</div><div class="today-bars">' +
       bar('Proteine', eaten.p, t.p, 'p') + bar('Carboidrati', eaten.c, t.c, 'c') + bar('Grassi', eaten.f, t.f, 'f') +
       '<p class="today-note">' + goalLabel(me.goal) + ' · ' + (left > 0 ? 'ti restano <b>' + N.f0(left) + ' kcal</b>' : 'obiettivo calorico raggiunto') + '</p></div>' +
@@ -275,6 +277,7 @@
   N.views.profilo = function () {
     var editId = N.editId || (N.me() && N.me().id), p = N.S.profiles.find(function (x) { return x.id === editId; }) || N.me();
     var h = demoBanner() + '<div class="view-head"><h1>Profilo</h1><p class="muted">Persone in casa, obiettivi e allergie</p></div>';
+    if (N.avatarCard) h += N.avatarCard();
     h += '<div class="chips scroll">' + N.S.profiles.map(function (x) {
       return chip(x.name + (x.id === N.S.meId ? ' (tu)' : ''), x.id === p.id, 'data-a="edit-person" data-id="' + x.id + '"');
     }).join('') + '<button class="chip add" data-a="add-person">' + N.IC.plus + 'Persona</button></div>';
@@ -285,7 +288,7 @@
     h += N.profileForm(p, 'edit');
     if (p.id !== N.S.meId) h += '<div class="row-actions"><button class="btn ghost" data-a="set-me" data-id="' + p.id + '">Questa persona sono io</button><button class="btn danger ghost" data-a="del-person" data-id="' + p.id + '">' + N.IC.trash + 'Elimina</button></div>';
     h += notifyCard() + accountCard();
-    h += '<p class="credits">Crediti · Icone di <a href="https://icons8.com" target="_blank" rel="noopener">Icons8</a></p>';
+    h += '<p class="credits">Crediti · Icone di <a href="https://icons8.com" target="_blank" rel="noopener">Icons8</a> · Avatar <a href="https://avataaars.com" target="_blank" rel="noopener">Avataaars</a> di Pablo Stanley, con <a href="https://www.dicebear.com" target="_blank" rel="noopener">DiceBear</a></p>';
     return h;
   };
   function notifyCard() {

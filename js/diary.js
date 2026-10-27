@@ -201,7 +201,9 @@
       if (ing.length) saved = N.saveCustomRecipe({ t: title, tag: [c.slot === 'colazione' ? 'colazione' : c.slot === 'spuntino' ? 'spuntino' : 'unico'], min: 5, ing: ing, st: [] });
     }
     N.closeSheet(); N.render();
+    N.rewards.afterMeal('meal:' + meal.id, false, meal.id, logs);
     N.toast(title + ' in ' + N.SLOT_LABEL[c.slot].toLowerCase() + (logs.length ? ' · dispensa aggiornata' : '') + (saved ? ' · ricetta salvata' : ''), function () {
+      N.rewards.cancel('meal:' + meal.id);
       N.del('meals', meal.id);
       var ids = {}; logs.forEach(function (row) { if (!ids[row.id]) { ids[row.id] = 1; N.put('pantry', row); } });
       if (saved) N.del('custom_recipes', saved.id);

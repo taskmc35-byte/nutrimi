@@ -13,7 +13,9 @@
     if (N.gate) { view.innerHTML = N.views[N.gate](); window.scrollTo(0, 0); return; }
     view.innerHTML = N.views[N.tab]();
     document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === N.tab); b.setAttribute('aria-current', b.dataset.tab === N.tab ? 'page' : 'false'); });
-    var me = N.me(); $('#avatar').textContent = me ? me.name.charAt(0).toUpperCase() : '?';
+    var me = N.me(), av = $('#avatar');
+    if (me && N.avatarHtml) { av.innerHTML = N.avatarHtml(me, 34); av.classList.add('has-av'); } else { av.textContent = me ? me.name.charAt(0).toUpperCase() : '?'; av.classList.remove('has-av'); }
+    if (N.applyTheme) N.applyTheme();
   };
   /* re-render senza perdere il focus della ricerca (per gli aggiornamenti in tempo reale) */
   N.softRender = function () {
@@ -210,7 +212,9 @@
     if (!i.checked) {
       var p = N.addToPantry(i, i.grams || 0);
       i.checked = true; i.pantryId = p.id; N.put('shopping', i); N.render();
+      if (i.code) N.rewards.later('scan:' + p.id, function () { N.rewards.award('scan', i.code); });
       N.toast(i.name + ' è in dispensa' + (i.grams ? '' : ' (indica la quantità dalla dispensa)'), function () {
+        N.rewards.cancel('scan:' + p.id);
         N.del('pantry', p.id); i.checked = false; delete i.pantryId; N.put('shopping', i);
       });
     } else {
@@ -267,7 +271,8 @@
     p.exp = readExp() || undefined;
     if (p.foodId && p.cat === 'Altro') p.cat = N.FOOD[p.foodId].cat;
     var it = N.addToPantry(p, g); N.closeSheet(); N.render();
-    N.toast(p.name + ' in dispensa', function () { N.del('pantry', it.id); });
+    if (p.code) N.rewards.later('scan:' + it.id, function () { N.rewards.award('scan', p.code); });
+    N.toast(p.name + ' in dispensa', function () { N.rewards.cancel('scan:' + it.id); N.del('pantry', it.id); });
   };
 
   // DISPENSA
@@ -278,7 +283,9 @@
   };
   A['pi-trash'] = function (el) {
     var i = N.S.pantry.find(function (x) { return x.id === el.dataset.id; }); if (!i) return;
-    N.del('pantry', i.id); N.render(); N.toast(i.name + ' tolto dalla dispensa', function () { N.put('pantry', i); });
+    N.del('pantry', i.id); N.render();
+    N.rewards.later('waste:' + i.id, function () { N.rewards.award('waste', i.id, true); });
+    N.toast(i.name + ' tolto dalla dispensa', function () { N.rewards.cancel('waste:' + i.id); N.put('pantry', i); });
   };
   // data di scadenza
   A['exp-clear'] = function () { $('#exp-d').value = ''; $('#exp-cands').innerHTML = ''; };
@@ -394,7 +401,9 @@
     var meal = { id: N.uid(), date: N.today(), slot: c.slot || N.slotNow(), recipeId: r.id, title: r.t, servings: c.servings, eaters: c.eaters.slice(), per: ev.per, at: Date.now() };
     if (c.eaters.length) N.put('meals', meal);
     N.closeSheet(); N.render();
+    if (c.eaters.length) N.rewards.afterMeal('meal:' + meal.id, true, meal.id, logs);
     N.toast('Buon appetito! Dispensa aggiornata', function () {
+      N.rewards.cancel('meal:' + meal.id);
       var ids = {}; logs.forEach(function (row) { if (!ids[row.id]) { ids[row.id] = 1; N.put('pantry', row); } });
       if (c.eaters.length) N.del('meals', meal.id);
     });
@@ -591,6 +600,7 @@
       if (!N.me()) { N.gate = 'welcome'; return N.render(); }
     }
     N.render();
+    N.rewards.refresh().then(function () { N.softRender(); return N.rewards.award('week', ''); }).catch(function () { });
     setTimeout(function () {
       Promise.resolve(N.push.autoEnable()).catch(function () { }).then(function () { try { N.push.checkLocal(); } catch (e) { } });
     }, 1500);

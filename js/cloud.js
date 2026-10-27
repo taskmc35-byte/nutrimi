@@ -76,15 +76,20 @@
   };
 
   /* le modifiche che non arrivano al server restano in coda e si riprovano */
-  var pending = {};
+  var pending = {}, inflight = {}, seq = 0;
   C.pendingCount = function () { return Object.keys(pending).length; };
+  /* si risolve quando le scritture partite finora sono arrivate (o fallite) */
+  C.idle = function () { return Promise.all(Object.keys(inflight).map(function (k) { return inflight[k]; })); };
   function run(key, op) {
     pending[key] = op; N.syncState('saving');
-    return op().then(function (r) {
+    var n = ++seq;
+    var pr = op().then(function (r) {
       if (r && r.error) throw r.error;
       if (pending[key] === op) delete pending[key];
       N.syncState('ok');
-    }).catch(function (err) { N.syncState('error', err); });
+    }).catch(function (err) { N.syncState('error', err); }).then(function () { delete inflight[n]; });
+    inflight[n] = pr;
+    return pr;
   }
   C.upsert = function (table, row) {
     var copy = JSON.parse(JSON.stringify(row));
