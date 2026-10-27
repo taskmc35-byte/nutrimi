@@ -35,13 +35,17 @@
       accessories: [a.accessories === 'none' ? 'round' : a.accessories], accessoriesProbability: a.accessories === 'none' ? 0 : 100, accessoriesColor: ['262e33'],
       eyes: [a.eyes], eyebrows: [a.eyebrows], mouth: [a.mouth]
     };
-    var s = window.NAV.svg(o).replace('<svg ', '<svg aria-hidden="true" focusable="false" ');
+    var s;
+    try { s = window.NAV.svg(o).replace('<svg ', '<svg aria-hidden="true" focusable="false" '); }
+    catch (e) { console.error('avatar', e); N.avatarError = String(e && e.message || e); return ''; }
     cache[key] = s; return s;
   }
   /* avatar con sfondo e cornice; size in px */
   N.avatarHtml = function (p, size, extra, override) {
     var a = Object.assign(N.avatarOf(p), override || {});
-    return '<span class="av bg-' + a.bg + ' fr-' + a.frame + (extra ? ' ' + extra : '') + '" style="--av:' + (size || 40) + 'px"><span class="av-in">' + svgFor(a) + '</span></span>';
+    var svg = svgFor(a);
+    var inner = svg || '<b class="av-ini">' + esc(String((p && p.name) || '?').charAt(0).toUpperCase()) + '</b>';
+    return '<span class="av bg-' + a.bg + ' fr-' + a.frame + (extra ? ' ' + extra : '') + '" style="--av:' + (size || 40) + 'px"><span class="av-in">' + inner + '</span></span>';
   };
 
   /* tema dell'app (solo per chi lo ha scelto, su questo dispositivo) */

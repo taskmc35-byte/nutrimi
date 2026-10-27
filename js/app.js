@@ -11,11 +11,16 @@
     var view = $('#view');
     document.body.classList.toggle('gated', !!N.gate);
     if (N.gate) { view.innerHTML = N.views[N.gate](); window.scrollTo(0, 0); return; }
-    view.innerHTML = N.views[N.tab]();
+    try { view.innerHTML = N.views[N.tab](); }
+    catch (err) {
+      console.error(err);
+      view.innerHTML = '<section class="card"><h2>Qualcosa non ha funzionato</h2><p class="muted small">Riapri l\'app. Se succede ancora, manda questo messaggio a chi ti segue: <code>' + N.esc(String(err && (err.message || err))) + ' · ' + N.esc(String(err && err.stack || '').split('\n').slice(0, 2).join(' | ')) + '</code></p></section>';
+    }
     document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === N.tab); b.setAttribute('aria-current', b.dataset.tab === N.tab ? 'page' : 'false'); });
     var me = N.me(), av = $('#avatar');
-    if (me && N.avatarHtml) { av.innerHTML = N.avatarHtml(me, 34); av.classList.add('has-av'); } else { av.textContent = me ? me.name.charAt(0).toUpperCase() : '?'; av.classList.remove('has-av'); }
-    if (N.applyTheme) N.applyTheme();
+    var avh = ''; try { avh = me && N.avatarHtml ? N.avatarHtml(me, 34) : ''; } catch (e) { console.error(e); }
+    if (avh) { av.innerHTML = avh; av.classList.add('has-av'); } else { av.textContent = me ? String(me.name || '?').charAt(0).toUpperCase() : '?'; av.classList.remove('has-av'); }
+    try { if (N.applyTheme) N.applyTheme(); } catch (e) { console.error(e); }
   };
   /* re-render senza perdere il focus della ricerca (per gli aggiornamenti in tempo reale) */
   N.softRender = function () {
