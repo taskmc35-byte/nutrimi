@@ -570,7 +570,9 @@
     var d = ctx.draft || {};
     var fld = function (id, l, val) { return '<label class="field"><span>' + l + '</span><input id="' + id + '" type="number" inputmode="decimal" step="0.1" min="0" value="' + (val != null ? val : '') + '"></label>'; };
     var n = d.n || {};
-    var h = '<div class="sh-head"><p class="eyebrow">Dispensa</p><h2>' + (d.code ? 'Prodotto non trovato' : 'Inserimento manuale') + '</h2>' + (d.code ? '<p class="muted small">Il codice ' + esc(d.code) + ' non è nel database di Open Food Facts: copia i valori dall’etichetta.</p>' : '') + '</div>' +
+    var h = '<div class="sh-head"><p class="eyebrow">Dispensa</p><h2>' + (d.code ? 'Prodotto non trovato' : 'Inserimento manuale') + '</h2>' + (d.code ? '<p class="muted small">Il codice ' + esc(d.code) + ' non è ancora in Nutrimi né su Open Food Facts. Fotografa la tabella nutrizionale o copia i valori: lo salviamo, così chi lo scansiona dopo lo trova già pronto.</p>' : '') + '</div>' +
+      '<button type="button" class="btn ghost block ocr-btn" data-a="mn-ocr">' + N.IC.camera + 'Leggi i valori dalla foto della tabella</button>' +
+      '<input id="mn-file" type="file" accept="image/*" capture="environment" hidden><p id="mn-ocr-msg" class="ocr-msg" role="status" hidden></p>' +
       '<label class="field"><span>Nome del prodotto</span><input id="mn-name" value="' + esc(d.name || '') + '"></label>' +
       '<div class="grid2">' + fld('mn-g', 'Quantità (g)', d.grams) + fld('mn-kcal', 'kcal / 100 g', n.kcal) + fld('mn-p', 'Proteine', n.p) + fld('mn-c', 'Carboidrati', n.c) + fld('mn-s', 'di cui zuccheri', n.s) +
       fld('mn-f', 'Grassi', n.f) + fld('mn-sat', 'di cui saturi', n.sat) + fld('mn-fib', 'Fibre', n.fib) + '</div>' +
@@ -589,7 +591,7 @@
       (conf.length ? conflictBadges(conf) : '<div class="okbox">' + N.IC.check + 'Nessun allergene segnalato per le persone di casa</div>') + alList(p) +
       '<label class="field"><span>Quantità (g)</span><input id="sc-g" type="number" inputmode="numeric" min="1" value="' + (p.grams || '') + '"></label>' +
       N.expField(p.exp) + foodMatch(p) + N.nutrTable(p.n, 100, 'Valori da etichetta') +
-      '<p class="muted tiny">Dati da Open Food Facts, database aperto e collaborativo: in caso di allergie gravi controlla sempre l’etichetta.</p>' +
+      '<p class="muted tiny">' + (p.source === 'nutrimi' ? 'Dati inseriti da utenti Nutrimi' : 'Dati da Open Food Facts, database aperto e collaborativo') + ': in caso di allergie gravi controlla sempre l’etichetta.</p>' +
       '<div class="sh-foot two"><button class="btn ghost" data-a="sc-shop">Metti in lista</button><button class="btn primary" data-a="sc-pantry">Metti in dispensa</button></div>';
     return h;
   };

@@ -12,11 +12,12 @@
     });
   }
   /* immagine ridimensionata, in scala di grigi e con più contrasto: la data stampata si legge meglio */
-  async function prepare(file) {
+  async function prepare(file, raw) {
     var bmp = await createImageBitmap(file);
     var scale = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
     var c = document.createElement('canvas'); c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
     var x = c.getContext('2d'); x.drawImage(bmp, 0, 0, c.width, c.height);
+    if (raw) return c;
     var img = x.getImageData(0, 0, c.width, c.height), d = img.data;
     for (var i = 0; i < d.length; i += 4) {
       var g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
@@ -63,6 +64,18 @@
       }
     }
     return out.filter(function (v, i) { return out.indexOf(v) === i; }).sort();
+  };
+  /* testo letto da una foto (usato anche per la tabella nutrizionale) */
+  /* raw: solo ridimensionata; auto: impaginazione automatica (tabelle a più colonne) */
+  N.ocrText = async function (file, lang, raw, auto) {
+    await loadTesseract();
+    var canvas = await prepare(file, raw);
+    var w = await window.Tesseract.createWorker(lang || 'eng');
+    try {
+      if (auto) await w.setParameters({ tessedit_pageseg_mode: '3' });
+      var res = await w.recognize(canvas);
+      return res.data.text || '';
+    } finally { w.terminate(); }
   };
   N.ocrExpiry = async function (file) {
     await loadTesseract();

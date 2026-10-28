@@ -350,8 +350,9 @@
       al: al, lat: al.indexOf('latte') !== -1, exp: readExp() || undefined
     };
   }
-  A['mn-save'] = function () { var p = readManual(); if (!p) return; N.addToPantry(p, p.grams); N.closeSheet(); N.render(); N.toast(p.name + ' in dispensa'); };
-  A['mn-to-shop'] = function () { var p = readManual(); if (!p) return; addShop(p); N.closeSheet(); N.render(); N.toast(p.name + ' in lista'); };
+  function remember(p) { if (p.code && p.n && N.products) N.products.save(p); }
+  A['mn-save'] = function () { var p = readManual(); if (!p) return; remember(p); N.addToPantry(p, p.grams); N.closeSheet(); N.render(); N.toast(p.name + ' in dispensa' + (p.code && p.n ? ' · salvato per le prossime scansioni' : '')); };
+  A['mn-to-shop'] = function () { var p = readManual(); if (!p) return; remember(p); addShop(p); N.closeSheet(); N.render(); N.toast(p.name + ' in lista' + (p.code && p.n ? ' · salvato per le prossime scansioni' : '')); };
   A.basics = function () { N.openSheet('basics'); };
   A['basic-toggle'] = function (el) {
     var id = el.dataset.id, ex = N.S.pantry.find(function (i) { return i.foodId === id && i.always; });
