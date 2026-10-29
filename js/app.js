@@ -344,6 +344,7 @@
     var hasN = v('mn-kcal') || v('mn-p') || v('mn-c') || v('mn-f');
     var al = Array.prototype.map.call(document.querySelectorAll('input[name="mn-al"]:checked'), function (i) { return i.value; });
     var fid = $('#edit-food').value || null;
+    if (!fid) { var g = N.guessFood(name); if (g) fid = g.id; } // così il prodotto vale anche nelle ricette
     return {
       name: name, grams: v('mn-g'), source: 'manuale', foodId: fid, cat: fid ? N.FOOD[fid].cat : 'Altro', code: (N.sheetCtx.draft || {}).code,
       n: hasN ? { kcal: v('mn-kcal'), p: v('mn-p'), c: v('mn-c'), s: v('mn-s'), f: v('mn-f'), sat: v('mn-sat'), fib: v('mn-fib'), A: 0, C: 0, D: 0, E: 0, B12: 0 } : undefined,

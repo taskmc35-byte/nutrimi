@@ -67,7 +67,7 @@
   function itemRow(it) {
     var f = it.foodId && N.FOOD[it.foodId], pz = it.pz || (f && f.pz);
     var av = it.foodId && !isEst(it) ? N.available(it.foodId) : null;
-    var inPantry = av && (av.grams > 0 || av.always);
+    var inPantry = it.pantryId ? N.S.pantry.some(function (x) { return x.id === it.pantryId; }) : av && (av.grams > 0 || av.always);
     var qty = pz
       ? '<div class="stepper"><button type="button" data-a="log-step" data-key="' + it.key + '" data-d="-1" aria-label="Meno">' + N.IC.minus + '</button><span class="num">' + N.f1(it.grams / pz) + ' <em>pz</em></span><button type="button" data-a="log-step" data-key="' + it.key + '" data-d="1" aria-label="Più">' + N.IC.plus + '</button></div>'
       : '<label class="gram-in"><input type="number" inputmode="decimal" min="0" step="5" value="' + Math.round(it.grams) + '" data-in="log-g" data-key="' + it.key + '" aria-label="Grammi di ' + esc(it.name) + '"><span>g</span></label>';
@@ -84,21 +84,28 @@
         return '<button type="button" class="chip" data-a="log-recent" data-i="' + i + '">' + N.IC.plus + esc(it.name) + '</button>';
       }).join('') + '</div>' : '<p class="muted small">Cerca un alimento o una voce da bar, per esempio «cappuccino», «granola», «trancio di pizza».</p>';
     }
-    var res = N.searchFoods(q, 8);
+    var res = N.searchFoods(q, 8), pan = N.searchPantry(q, 4);
     var recs = N.allRecipes().filter(function (r) { return N.norm(r.t).indexOf(N.norm(q)) !== -1; }).slice(0, 3);
-    return '<ul class="sugg">' + res.map(function (f) {
+    return '<ul class="sugg">' + pan.map(pantryHit('log-pick-pantry')).join('') + res.map(function (f) {
       return '<li><button type="button" data-a="log-pick" data-food="' + f.id + '"><span class="name">' + esc(f.name) + (f.est ? ' <em class="est">stima</em>' : '') + '</span><span class="meta">' + esc(f.cat) +
         (f.pz ? ' · 1 pz ≈ ' + f.pz + ' g · ' + N.f0(f.n.kcal * f.pz / 100) + ' kcal' : ' · ' + N.f0(f.n.kcal) + ' kcal/100 g') + '</span></button></li>';
     }).join('') + recs.map(function (r) {
       return '<li><button type="button" data-a="log-recipe" data-id="' + r.id + '"><span class="name">' + esc(r.t) + '</span><span class="meta">Ricetta · 1 porzione</span></button></li>';
-    }).join('') + (res.length || recs.length ? '' : '<li><p class="muted small pad">Nessun alimento trovato. Prova con un nome più semplice o usa lo scanner.</p></li>') + '</ul>';
+    }).join('') + (res.length || recs.length || pan.length ? '' : '<li><p class="muted small pad">Nessun alimento trovato. Prova con un nome più semplice o usa lo scanner.</p></li>') + '</ul>';
+  }
+  function pantryHit(action) {
+    return function (i) {
+      var n = N.itemNutr(i);
+      return '<li><button type="button" data-a="' + action + '" data-id="' + i.id + '"><span class="name">' + esc(i.name) + ' <em class="inpan">in dispensa</em></span><span class="meta">' +
+        esc([i.brand, N.qty(i.grams, i), n ? N.f0(n.kcal) + ' kcal/100 g' : ''].filter(Boolean).join(' · ')) + '</span></button></li>';
+    };
   }
   N.renderLogResults = function () { var el = $('#log-res'); if (el) el.innerHTML = logResults(N.sheetCtx); };
 
   N.sheets.logAdd = function (ctx) {
     var items = ctx.items, t = logTotals(items), me = N.me(), tg = me ? N.targets(me) : null;
     var eaten = me ? N.dayTotals(me.id, N.today()) : N.zero();
-    var anyPantry = items.some(function (it) { return it.foodId && !isEst(it) && (N.available(it.foodId).grams > 0); });
+    var anyPantry = items.some(function (it) { return it.pantryId || (it.foodId && !isEst(it) && (N.available(it.foodId).grams > 0)); });
     var h = '<div class="sh-head"><p class="eyebrow">Diario</p><h2>Aggiungi al diario</h2></div>';
     h += slotChips(ctx.slot, 'log-slot');
     h += '<div class="adder"><label class="search">' + N.IC.search + '<input id="log-q" data-in="log-q" autocomplete="off" placeholder="Cosa hai mangiato?" value="' + esc(ctx.q || '') + '" aria-label="Cerca alimento"></label>' +
@@ -134,7 +141,7 @@
   N.defaultGrams = function (f) { return f.pz || PORZ[f.id] || PORZ_CAT[f.cat] || 100; };
   function addItem(src) {
     var c = N.sheetCtx, f = src.foodId && N.FOOD[src.foodId];
-    var ex = c.items.find(function (i) { return src.foodId && i.foodId === src.foodId && !i.n && !src.n; });
+    var ex = c.items.find(function (i) { return src.pantryId ? i.pantryId === src.pantryId : (src.foodId && i.foodId === src.foodId && !i.n && !src.n && !i.pantryId); });
     var pz = src.pz || (f && f.pz);
     if (ex) { ex.grams += pz || (f ? N.defaultGrams(f) : 50); }
     else c.items.push(Object.assign({ key: N.uid(), grams: src.grams || pz || 100 }, src));
@@ -149,6 +156,11 @@
   };
   A['log-slot'] = function (el) { N.sheetCtx.slot = el.dataset.slot; N.refreshSheet(); };
   A['log-pick'] = function (el) { var f = N.FOOD[el.dataset.food]; addItem({ foodId: f.id, name: f.name, grams: N.defaultGrams(f) }); };
+  A['log-pick-pantry'] = function (el) {
+    var i = N.S.pantry.find(function (x) { return x.id === el.dataset.id; }); if (!i) return;
+    var f = i.foodId && N.FOOD[i.foodId], pz = i.pz || (f && f.pz);
+    addItem({ foodId: i.foodId || null, pantryId: i.id, name: i.name, n: i.n || undefined, pz: pz, grams: pz || (f ? N.defaultGrams(f) : Math.min(100, +i.grams || 100)) });
+  };
   A['log-recent'] = function (el) { var it = recentFoods()[+el.dataset.i]; if (it) addItem({ foodId: it.foodId, name: it.name, grams: it.grams, n: it.n, pz: it.pz, est: it.est }); };
   A['log-recipe'] = function (el) {
     var r = N.recipeById(el.dataset.id); if (!r) return;
@@ -188,6 +200,7 @@
     var title = ($('#log-title') && $('#log-title').value.trim()) || autoTitle(items);
     var per = logTotals(items), logs = [];
     if (c.fromPantry) items.forEach(function (it) {
+      if (it.pantryId) { logs = logs.concat(N.consumeItem(it.pantryId, it.grams)); return; }
       if (!it.foodId || isEst(it)) return;
       var av = N.available(it.foodId); if (av.always || av.grams <= 0) return;
       logs = logs.concat(N.consume(it.foodId, Math.min(av.grams, it.grams)));
@@ -249,11 +262,44 @@
   };
   function reResults(ctx) {
     var q = ctx.q || ''; if (!q.trim()) return '';
-    var res = N.searchFoods(q, 6);
-    return '<ul class="sugg">' + res.map(function (f) {
+    var res = N.searchFoods(q, 6), pan = N.searchPantry(q, 4);
+    if (ctx.link) return linkChooser(ctx.link);
+    return '<ul class="sugg">' + pan.map(pantryHit('re-pick-pantry')).join('') + res.map(function (f) {
       return '<li><button type="button" data-a="re-pick" data-food="' + f.id + '"><span class="name">' + esc(f.name) + '</span><span class="meta">' + esc(f.cat) + '</span></button></li>';
-    }).join('') + (res.length ? '' : '<li><p class="muted small pad">Nessun alimento trovato con questo nome.</p></li>') + '</ul>';
+    }).join('') + (res.length || pan.length ? '' : '<li><p class="muted small pad">Nessun alimento trovato con questo nome.</p></li>') + '</ul>';
   }
+  /* un prodotto della dispensa senza alimento collegato: chiediamo a cosa corrisponde, una volta sola */
+  function linkChooser(id) {
+    var i = N.S.pantry.find(function (x) { return x.id === id; }); if (!i) return '';
+    var g = N.guessFood(i.name), sug = N.searchFoods(i.name, 5);
+    if (g && !sug.some(function (f) { return f.id === g.id; })) sug.unshift(g);
+    if (!sug.length) { var w = N.norm(i.name).split(' ')[0]; sug = N.searchFoods(w, 5); }
+    return '<div class="link-box"><p class="small"><b>' + esc(i.name) + '</b> è in dispensa. Per usarlo nelle ricette dimmi a quale alimento corrisponde: lo ricordo per le prossime volte e lo scalo quando cucini.</p>' +
+      '<div class="chips">' + sug.slice(0, 5).map(function (f) { return N.ui.chip(f.name, false, 'data-a="re-link" data-food="' + f.id + '"'); }).join('') + '</div>' +
+      '<label class="field"><span>Oppure cerca</span><input id="re-link-q" data-in="re-link-q" autocomplete="off" placeholder="es. pane, yogurt, tonno"></label><div id="re-link-res"></div>' +
+      '<button type="button" class="link small" data-a="re-link-cancel">Annulla</button></div>';
+  }
+  A['re-pick-pantry'] = function (el) {
+    readReForm(); var i = N.S.pantry.find(function (x) { return x.id === el.dataset.id; }); if (!i) return;
+    if (i.foodId && N.FOOD[i.foodId]) { addReIng(N.FOOD[i.foodId], i); return; }
+    N.sheetCtx.link = i.id; N.refreshSheet();
+  };
+  function addReIng(f, item) {
+    var d = N.sheetCtx.draft, pz = (item && item.pz) || f.pz;
+    d.ing.push({ key: N.uid(), foodId: f.id, grams: (pz || N.defaultGrams(f)) * d.servings });
+    N.sheetCtx.q = ''; N.sheetCtx.link = null; N.refreshSheet(); var q = $('#re-q'); if (q) q.focus();
+  }
+  A['re-link'] = function (el) {
+    readReForm(); var i = N.S.pantry.find(function (x) { return x.id === N.sheetCtx.link; }), f = N.FOOD[el.dataset.food]; if (!i || !f) return;
+    i.foodId = f.id; if (!i.n && (!i.cat || i.cat === 'Altro')) i.cat = f.cat; N.put('pantry', i);
+    N.toast(i.name + ' ora conta come «' + f.name + '» nelle ricette');
+    addReIng(f, i);
+  };
+  A['re-link-cancel'] = function () { readReForm(); N.sheetCtx.link = null; N.refreshSheet(); };
+  IN['re-link-q'] = function (e) {
+    var el = $('#re-link-res'); if (!el) return;
+    el.innerHTML = '<div class="chips">' + N.searchFoods(e.target.value, 6).map(function (f) { return N.ui.chip(f.name, false, 'data-a="re-link" data-food="' + f.id + '"'); }).join('') + '</div>';
+  };
   function readReForm() {
     var d = N.sheetCtx.draft, t = $('#re-t'), m = $('#re-min'), st = $('#re-st');
     if (t) d.t = t.value; if (m) d.min = +m.value || ''; if (st) d.st = st.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
@@ -279,7 +325,7 @@
     N.sheetCtx.q = ''; N.refreshSheet(); var q = $('#re-q'); if (q) q.focus();
   };
   A['re-rm'] = function (el) { readReForm(); N.sheetCtx.draft.ing = N.sheetCtx.draft.ing.filter(function (x) { return x.key !== el.dataset.key; }); N.refreshSheet(); };
-  IN['re-q'] = function (e) { N.sheetCtx.q = e.target.value; var el = $('#re-res'); if (el) el.innerHTML = reResults(N.sheetCtx); };
+  IN['re-q'] = function (e) { N.sheetCtx.q = e.target.value; N.sheetCtx.link = null; var el = $('#re-res'); if (el) el.innerHTML = reResults(N.sheetCtx); };
   IN['re-g'] = function (e) { var x = N.sheetCtx.draft.ing.find(function (i) { return i.key === e.target.dataset.key; }); if (x) x.grams = Math.max(0, parseFloat(String(e.target.value).replace(',', '.')) || 0); };
   IN['re-t'] = function (e) { N.sheetCtx.draft.t = e.target.value; };
   A['re-save'] = function () {

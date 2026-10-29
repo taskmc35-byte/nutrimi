@@ -31,7 +31,7 @@
     F('orzo_perlato', 'Orzo perlato', CP, 320, 10, 71, 0.8, 1.2, 0.3, 9, 1, 0, 0, 0.1, 0, 'glutine', { alias: ['orzo'] }),
     F('quinoa', 'Quinoa', CP, 368, 14, 64, 0, 6, 0.7, 7, 1, 0, 0, 2.4, 0, ''),
     F('cous_cous', 'Cous cous', CP, 360, 12.5, 72, 0.5, 1.5, 0.3, 5, 0, 0, 0, 0.1, 0, 'glutine', { alias: ['couscous', 'cuscus'] }),
-    F('pane', 'Pane comune', CP, 270, 9, 55, 2, 1.5, 0.3, 3, 0, 0, 0, 0.3, 0, 'glutine', { alias: ['pane casereccio', 'pane raffermo', 'baguette', 'pane pugliese', 'ciabatta', 'pagnotta', 'fette di pane'] }),
+    F('pane', 'Pane comune', CP, 270, 9, 55, 2, 1.5, 0.3, 3, 0, 0, 0, 0.3, 0, 'glutine', { alias: ['pane bianco', 'pane casereccio', 'pane raffermo', 'baguette', 'pane pugliese', 'ciabatta', 'pagnotta', 'fette di pane'] }),
     F('pane_integrale', 'Pane integrale', CP, 250, 10, 46, 3, 2.5, 0.5, 7, 0, 0, 0, 0.4, 0, 'glutine'),
     F('farina_00', 'Farina 00', CP, 340, 11, 73, 1.5, 1, 0.2, 2.2, 0, 0, 0, 0.1, 0, 'glutine', { alias: ['farina', 'farina tipo 00', 'farina 0', 'farina di grano tenero'] }),
     F('fiocchi_avena', "Fiocchi d'avena", CP, 370, 13, 60, 1, 7, 1.2, 10, 0, 0, 0, 0.7, 0, 'glutine', { alias: ['avena', 'fiocchi di avena', "fiocchi d'avena"] }),

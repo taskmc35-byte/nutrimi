@@ -698,3 +698,6 @@ body.gated .toast { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 .ocr-msg.ok { background: var(--ok-soft); color: var(--ok); }
 .ocr-msg.bad { background: var(--bad-soft); color: var(--bad); }
 input.ocr-filled { border-color: var(--ok) !important; }
+.inpan { font-style: normal; font-size: 11.5px; font-weight: 600; color: var(--ok); background: var(--ok-soft); padding: 1px 7px; border-radius: 999px; margin-left: 4px; }
+.link-box { background: var(--bg-3); border: 1px solid var(--line-2); border-radius: var(--r-s); padding: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.link-box .chips { flex-wrap: wrap; }

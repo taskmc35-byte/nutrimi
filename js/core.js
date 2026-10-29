@@ -252,6 +252,27 @@
     });
     return log;
   };
+  /* scala da un prodotto preciso della dispensa (es. il pane di quella marca) */
+  N.consumeItem = function (id, grams) {
+    var i = N.S.pantry.find(function (x) { return x.id === id; }); if (!i || i.always) return [];
+    var before = +i.grams || 0, take = Math.min(before, grams), log = [JSON.parse(JSON.stringify(i))];
+    if (before - take <= 0.5) N.del('pantry', i.id); else { i.grams = Math.round((before - take) * 10) / 10; N.put('pantry', i); }
+    return log;
+  };
+  /* prodotti in dispensa che corrispondono alla ricerca (non scaduti, non finiti) */
+  N.searchPantry = function (q, limit) {
+    q = N.norm(q); if (!q) return [];
+    var words = q.split(' ').filter(function (w) { return w.length > 1; });
+    var seen = {};
+    return N.S.pantry.filter(function (i) {
+      if (i.always || !(+i.grams > 0)) return false;
+      var d = N.daysLeft(i.exp); if (d != null && d < 0) return false;
+      var k = N.norm((i.name || '') + ' ' + (i.brand || '') + ' ' + ((i.foodId && N.FOOD[i.foodId]) ? N.FOOD[i.foodId].name : ''));
+      if (!(k.indexOf(q) !== -1 || (words.length && words.every(function (w) { return k.indexOf(w) !== -1; })))) return false;
+      var key = N.norm(i.name) + '|' + (i.foodId || '');
+      if (seen[key]) return false; seen[key] = 1; return true;
+    }).slice(0, limit || 4);
+  };
   N.restore = function (log) { log.forEach(function (row) { N.put('pantry', row); }); };
 
   N.addToPantry = function (src, grams) {
