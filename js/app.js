@@ -534,7 +534,10 @@
       N.cloud.joinHousehold(code).then(function (hid) {
         if (!hid) { he.textContent = 'Codice non valido.'; he.hidden = false; return; }
         N.boot();
-      }, function () { he.textContent = 'Codice non trovato: controlla le lettere e riprova.'; he.hidden = false; });
+      }, function (er) {
+        he.textContent = /troppi tentativi/i.test(er && er.message || '') ? 'Troppi codici sbagliati: riprova tra un’ora.' : 'Codice non trovato: controlla le lettere e riprova.';
+        he.hidden = false;
+      });
     }
   }
 

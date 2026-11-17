@@ -57,7 +57,9 @@
   };
   C.joinHousehold = async function (code) {
     var r = await C.sb.rpc('join_household', { p_code: String(code || '').trim().toUpperCase() });
-    if (r.error) throw r.error; return C.loadHousehold();
+    if (r.error) throw r.error;
+    if (!r.data) throw new Error('Codice non valido');
+    return C.loadHousehold();
   };
 
   C.pull = async function () {

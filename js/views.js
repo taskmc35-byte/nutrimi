@@ -392,7 +392,7 @@
   N.views.household = function () {
     return '<div class="gate-wrap"><div class="brand-big">' + logo() + '<p class="claim">Una casa, una dispensa condivisa.</p></div>' +
       '<form class="card" id="hhform-new" novalidate><h2>Crea la tua casa</h2><p class="muted small">Poi potrai condividere il codice con chi vive con te.</p><label class="field"><span>Nome</span><input id="hh-name" placeholder="es. Casa Rossi"></label><button class="btn primary block" type="submit">Crea</button></form>' +
-      '<form class="card" id="hhform-join" novalidate><h2>Hai un codice?</h2><label class="field"><span>Codice casa</span><input id="hh-code" autocapitalize="characters" placeholder="es. 7F3K9Q"></label><p class="form-err" id="hh-err" hidden></p><button class="btn ghost block" type="submit">Entra nella casa</button></form></div>';
+      '<form class="card" id="hhform-join" novalidate><h2>Hai un codice?</h2><label class="field"><span>Codice casa</span><input id="hh-code" autocapitalize="characters" placeholder="es. 7F3K9QXM2P"></label><p class="form-err" id="hh-err" hidden></p><button class="btn ghost block" type="submit">Entra nella casa</button></form></div>';
   };
   N.views.obProfile = function () {
     return '<div class="gate-wrap"><p class="eyebrow">Passo 1 di 3</p><h1>Il tuo profilo</h1><p class="muted">Servono per calcolare il fabbisogno e segnalarti gli allergeni mentre fai la spesa.</p>' + N.profileForm(N.obDraft || {}, 'onboarding') + '</div>';
